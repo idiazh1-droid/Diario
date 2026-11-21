@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Genera el boletín diario con estilo editorial clásico de periódico:
-lee RSS, extrae fotos, selecciona y profundiza con IA (Gemini),
-y escribe docs/index.html interactivo con estrellas, notas expandibles y descartes."""
+lee RSS, extrae fotos, selecciona y profundiza con IA (Gemini), traduce titulares en inglés al español,
+genera resúmenes de al menos 3 líneas y escribe docs/index.html interactivo."""
 import difflib
 import hashlib
 import html
@@ -30,16 +30,23 @@ MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
          "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
 SISTEMA = (
-    "Eres el editor jefe de un prestigioso diario matinal, en español. "
-    "Tu objetivo es seleccionar las noticias más trascendentes y redactar un resumen "
-    "y puntos clave objetivos, profundos y rigurosos. "
-    "Reglas estrictas:\n"
-    "1) No inventes datos, cifras, nombres ni contexto ausente en el texto entregado.\n"
-    "2) La primera nota elegida ([0]) será la PORTADA (noticia más relevante de la sección).\n"
-    "3) Atribuye afirmaciones controvertidas a su fuente o emisor.\n"
-    "4) Tono periodístico sobrio, culto y neutro.\n"
-    "5) Evita notas duplicadas sobre un mismo hecho.\n"
-    "6) Responde EXCLUSIVAMENTE con un JSON válido, sin preámbulo ni formato markdown."
+    "Eres el editor jefe de un prestigioso diario matinal en español. "
+    "Tu labor es seleccionar las noticias más trascendentes y redactar un resumen "
+    "y puntos clave rigurosos, objetivos y sustanciosos. "
+    "Reglas estrictas e inviolables:\n"
+    "1) No inventes datos, nombres, cifras ni contexto ausente en el texto entregado.\n"
+    "2) TRADUCCIÓN OBLIGATORIA DEL TITULAR: Si la noticia original proviene de un medio en inglés "
+    "o en cualquier otro idioma (ej. BBC News, Variety, Ars Technica), DEBES TRADUCIR Y ADAPTAR EL TITULAR AL ESPAÑOL "
+    "con calidad y rigor periodístico. Ningún titular debe quedar en inglés.\n"
+    "3) RESUMEN SUSTANCIOSO DE MÍNIMO 3 LÍNEAS: Cada noticia seleccionada debe tener un resumen descriptivo "
+    "de al menos 3 a 4 líneas completas de lectura (mínimo 280 caracteres, idealmente 300 a 450 caracteres). "
+    "Debe explicar con claridad: qué ocurrió, quiénes intervienen, antecedentes y por qué es relevante. "
+    "Nunca entregues resúmenes de una sola línea.\n"
+    "4) La primera nota elegida ([0]) será la PORTADA (la noticia más relevante de la sección).\n"
+    "5) Atribuye afirmaciones controvertidas a su fuente o emisor.\n"
+    "6) Tono periodístico sobrio, culto, neutro e informativo.\n"
+    "7) Evita notas duplicadas sobre un mismo acontecimiento.\n"
+    "8) Responde EXCLUSIVAMENTE con un JSON válido, sin preámbulos ni bloques markdown."
 )
 
 
@@ -154,7 +161,7 @@ def recolectar(seccion, aj, ahora, errores):
                 if f.get("busqueda") and real:
                     fuente = real
             else:
-                extracto = limpiar(e.get("summary") or e.get("description"))[:650]
+                extracto = limpiar(e.get("summary") or e.get("description"))[:750]
 
             notas.append({
                 "id": id_nota(enlace, titulo),
@@ -188,7 +195,7 @@ def recolectar(seccion, aj, ahora, errores):
     return unicas
 
 
-# ---------- selección y profundidad con IA ----------
+# ---------- selección, traducción y profundidad con IA ----------
 
 def con_ia(client, modelo, seccion, candidatas, n):
     lineas = []
@@ -202,12 +209,13 @@ def con_ia(client, modelo, seccion, candidatas, n):
         f"Criterio editorial: {' '.join(seccion['criterio'].split())}\n\n"
         f"Selecciona las {n} noticias de mayor valor (menos si no hay suficientes), "
         "ordenadas de mayor a menor relevancia.\n"
-        "La primera nota ([0]) será la PORTADA DESTACADA de la sección (preferir notas con foto si son relevantes).\n"
+        "La primera nota ([0]) será la PORTADA DESTACADA de la sección (preferir notas con foto si son de alto impacto).\n\n"
         "Para cada nota devuelve:\n"
-        "- id: índice de la lista\n"
-        "- resumen: síntesis periodística elegante de 1 o 2 frases (máx 230 caracteres).\n"
-        "- puntos_clave: lista con 2 o 3 viñetas concisas que profundicen el contexto, cifras o consecuencias.\n\n"
-        'Formato exacto: {"seleccion":[{"id":0,"resumen":"...","puntos_clave":["...","..."]}]}\n\n'
+        "- id: índice numérico de la lista de candidatas.\n"
+        "- titulo: titular de la noticia SIEMPRE en español. Si el original venía en inglés u otro idioma, tradúcelo y adáptalo con redacción periodística impecable.\n"
+        "- resumen: resumen descriptivo de AL MENOS 3 LÍNEAS COMPLETAS (mínimo 280 caracteres, ideal 300 a 450) que explique con claridad qué pasó, quiénes intervienen, antecedentes y consecuencias.\n"
+        "- puntos_clave: lista con 2 o 3 viñetas concisas con datos clave, cifras, citas o detalles de profundización.\n\n"
+        'Formato exacto requerido: {"seleccion":[{"id":0,"titulo":"Titular en español","resumen":"Resumen de al menos 3 líneas...","puntos_clave":["...","..."]}]}\n\n'
         "Candidatas:\n" + "\n".join(lineas)
     )
 
@@ -216,7 +224,7 @@ def con_ia(client, modelo, seccion, candidatas, n):
         contents=prompt,
         config={
             "system_instruction": SISTEMA,
-            "max_output_tokens": 2500,
+            "max_output_tokens": 3000,
             "response_mime_type": "application/json",
         },
     )
@@ -229,6 +237,9 @@ def con_ia(client, modelo, seccion, candidatas, n):
         if isinstance(i, int) and 0 <= i < len(candidatas) and i not in vistos:
             vistos.add(i)
             nota = dict(candidatas[i])
+            tit_traducido = limpiar(s.get("titulo", ""))
+            if tit_traducido and len(tit_traducido) > 4:
+                nota["titulo"] = tit_traducido
             nota["resumen"] = limpiar(s.get("resumen", ""))
             nota["puntos_clave"] = [limpiar(p) for p in s.get("puntos_clave", []) if p]
             nota["es_portada"] = (idx_sel == 0)
@@ -244,8 +255,8 @@ def sin_ia(candidatas, n):
     for idx, c in enumerate(candidatas[:n]):
         nota = dict(c)
         txt = c["extracto"]
-        nota["resumen"] = (txt[:220].rsplit(" ", 1)[0] + "…") if len(txt) > 220 else txt
-        nota["puntos_clave"] = [txt[220:450]] if len(txt) > 220 else []
+        nota["resumen"] = (txt[:320].rsplit(" ", 1)[0] + "…") if len(txt) > 320 else txt
+        nota["puntos_clave"] = [txt[320:600]] if len(txt) > 320 else []
         nota["es_portada"] = (idx == 0)
         salida.append(nota)
     return salida
@@ -305,7 +316,7 @@ body {
   margin: 0;
   background: var(--papel);
   color: var(--tinta);
-  font: 16px/1.6 "Newsreader", Georgia, "Times New Roman", serif;
+  font: 16px/1.65 "Newsreader", Georgia, "Times New Roman", serif;
 }
 
 .contenedor {
@@ -500,7 +511,7 @@ section.seccion-bloque {
 .nota-titulo a:hover { text-decoration: underline; }
 .nota-resumen {
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--tinta-suave);
   margin: 0 0 14px;
 }
