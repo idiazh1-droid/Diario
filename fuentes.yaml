@@ -1,40 +1,94 @@
 # Edita este archivo para cambiar secciones y fuentes. No hace falta tocar el código.
-#
-# Cada fuente admite:
-#   url:       dirección RSS directa (entrega extracto, por lo tanto mejor resumen)
-#   dominio:   sitio sin RSS o con RSS roto. Usa Google News filtrado por ese sitio (solo titulares)
-#   busqueda:  búsqueda libre en Google News, por ejemplo "litio Chile"
-# Si una fuente tiene url y dominio, usa la url y, si falla, recurre al dominio.
 
 ajustes:
   modelo: gemini-2.5-flash
   horas: 36              # antigüedad máxima de una nota
-  notas_por_seccion: 6   # tope duro por sección: el boletín siempre termina
+  notas_por_seccion: 6   # tope estándar por sección
   max_por_fuente: 8      # candidatas que se toman de cada fuente
-  max_candidatas: 28     # candidatas por sección que se entregan a la IA
+  max_candidatas: 35     # candidatas entregadas a la IA para seleccionar
 
 secciones:
   - id: chile
     nombre: Chile
     color: "#C8374A"
+    notas: 11            # 11 notas (6 base + 5 adicionales de política nacional)
     criterio: >
-      Hechos nacionales de alto impacto: política, economía, seguridad, salud,
-      educación, justicia y energía. Excluye farándula, deportes y notas de servicio menores.
+      Hechos nacionales de alto impacto en Chile: política de gobierno y oposición, economía,
+      seguridad pública, justicia, reformas sociales, salud, educación y energía.
+      Excluye farándula, deportes y notas de crónica roja menor.
     fuentes:
-      - nombre: CNN Chile
-        dominio: cnnchile.com
-      - nombre: BioBioChile
-        dominio: biobiochile.cl
+      - nombre: El Mercurio
+        dominio: elmercurio.com
+      - nombre: Las Últimas Noticias
+        dominio: lun.com
+      - nombre: CIPER Chile
+        url: https://www.ciperchile.cl/feed/
+        dominio: ciperchile.cl
       - nombre: La Tercera
         dominio: latercera.com
+      - nombre: BioBioChile
+        dominio: biobiochile.cl
+      - nombre: CNN Chile
+        dominio: cnnchile.com
+
+  - id: congreso
+    nombre: Congreso Nacional
+    color: "#8B1E3F"
+    notas: 6
+    criterio: >
+      Actividad legislativa y leyes en Chile. Prioriza y desglosa:
+      a) Proyectos de ley que están siendo discutidos o votados en la Cámara de Diputadas y Diputados (sala o comisiones).
+      b) Proyectos y reformas que están en debate o votación en el Senado.
+      c) Leyes recién promulgadas por el Ejecutivo o publicadas en el Diario Oficial.
+      Indica claramente el nombre o número de boletín de la ley, en qué trámite está y cómo afecta a los ciudadanos.
+    fuentes:
+      - nombre: Cámara de Diputados
+        dominio: camara.cl
+        busqueda: site:camara.cl "proyecto" OR "ley" OR "comisión" OR "sala"
+      - nombre: Senado de Chile
+        dominio: senado.cl
+        busqueda: site:senado.cl "proyecto" OR "ley" OR "comisión" OR "tabla"
+      - nombre: Diario Oficial / Leyes
+        busqueda: "Diario Oficial" Chile ley OR promulga OR "publicada"
+      - nombre: CIPER Chile
+        url: https://www.ciperchile.cl/feed/
+        dominio: ciperchile.cl
+      - nombre: El Mercurio
+        dominio: elmercurio.com
+      - nombre: Prensa Congreso
+        busqueda: "Cámara de Diputados" OR "Senado" Chile "proyecto de ley"
+
+  - id: ambiente
+    nombre: Medioambiente
+    color: "#2E9B5F"
+    notas: 8             # Ampliado con foco en Chile
+    criterio: >
+      Medioambiente, cambio climático, biodiversidad, contaminación, fiscalización ambiental,
+      conflictos socioambientales, recursos hídricos, áreas protegidas y transición energética.
+      Prioriza fuertemente a Chile y la región latinoamericana.
+    fuentes:
+      - nombre: CIPER Chile
+        url: https://www.ciperchile.cl/feed/
+        dominio: ciperchile.cl
+      - nombre: ONG FIMA
+        url: https://www.fima.cl/feed/
+        dominio: fima.cl
+      - nombre: Mongabay Latam
+        url: https://es.mongabay.com/feed/
+        dominio: es.mongabay.com
+      - nombre: El Mercurio
+        dominio: elmercurio.com
+      - nombre: Google News Medioambiente
+        busqueda: medio ambiente Chile OR glaciares OR litio OR sequía
 
   - id: mundo
     nombre: Geopolítica
     color: "#2A6FDB"
+    notas: 6
     criterio: >
-      Guerras y conflictos, relaciones entre potencias, diplomacia, sanciones,
-      elecciones con impacto internacional, comercio estratégico y energía.
-      Excluye crimen local, deportes y farándula.
+      Guerras y conflictos armados, relaciones entre potencias (EE.UU., China, Rusia, UE), diplomacia,
+      elecciones de impacto global, sanciones, comercio internacional y geopolítica energética.
+      Excluye sucesos locales y deportes.
     fuentes:
       - nombre: DW
         url: https://rss.dw.com/rdf/rss-sp-top
@@ -46,29 +100,14 @@ secciones:
       - nombre: CNN en Español
         dominio: cnnespanol.cnn.com
 
-  - id: ambiente
-    nombre: Medioambiente
-    color: "#2E9B5F"
-    criterio: >
-      Cambio climático, biodiversidad, contaminación, áreas protegidas,
-      evaluación ambiental, conflictos socioambientales y energía limpia.
-      Prioriza Chile y Latinoamérica.
-    fuentes:
-      - nombre: ONG FIMA
-        url: https://www.fima.cl/feed/
-        dominio: fima.cl
-      - nombre: Mongabay Latam
-        url: https://es.mongabay.com/feed/
-        dominio: es.mongabay.com
-      - nombre: Google News
-        busqueda: medio ambiente Chile
-
   - id: cine
     nombre: Cine
     color: "#C98A12"
+    notas: 6
     criterio: >
-      Estrenos relevantes, festivales, premios, industria y crítica.
-      Prioriza cine chileno y latinoamericano. Excluye series de TV y chismes.
+      Estrenos relevantes de cine, festivales internacionales, premios, crítica cinematográfica
+      y noticias de la industria. Prioriza cine chileno, latinoamericano y de autor.
+      Excluye chismes de farándula y series de televisión menores.
     fuentes:
       - nombre: Espinof
         url: https://feeds.weblogssl.com/espinof
@@ -83,9 +122,10 @@ secciones:
   - id: tecnologia
     nombre: Tecnología
     color: "#7A4FD6"
+    notas: 6
     criterio: >
-      Inteligencia artificial, hardware, software, ciberseguridad, regulación
-      tecnológica y ciencia aplicada. Excluye ofertas y reseñas menores de consumo.
+      Inteligencia artificial, ciberseguridad, avances de software y hardware, computación cuántica,
+      regulación digital y ciencia aplicada. Excluye ofertas comerciales y rumores de teléfonos.
     fuentes:
       - nombre: Xataka
         url: https://feeds.weblogssl.com/xataka2
