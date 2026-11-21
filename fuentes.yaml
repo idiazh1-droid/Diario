@@ -7,7 +7,7 @@
 # Si una fuente tiene url y dominio, usa la url y, si falla, recurre al dominio.
 
 ajustes:
-  modelo: gemini-2.0-flash
+  modelo: gemini-2.5-flash
   horas: 36              # antigüedad máxima de una nota
   notas_por_seccion: 6   # tope duro por sección: el boletín siempre termina
   max_por_fuente: 8      # candidatas que se toman de cada fuente
