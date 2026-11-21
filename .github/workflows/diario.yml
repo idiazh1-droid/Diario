@@ -2,8 +2,8 @@ name: Boletín diario
 
 on:
   schedule:
-    # 10:00 UTC = 07:00 en Chile
-    - cron: "0 10 * * *"
+    # 08:30 UTC = 05:30 AM en Chile (horario de verano UTC-3)
+    - cron: "30 8 * * *"
   workflow_dispatch:   # permite ejecutarlo a mano desde la pestaña Actions
 
 permissions:
