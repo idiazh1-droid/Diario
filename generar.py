@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-"""Genera el boletín diario: lee RSS, selecciona y resume con IA, escribe docs/index.html."""
+"""Genera el boletín diario con estilo editorial clásico de periódico:
+lee RSS, extrae fotos, selecciona y profundiza con IA (Gemini),
+y escribe docs/index.html interactivo con estrellas, notas expandibles y descartes."""
 import difflib
+import hashlib
 import html
 import json
 import os
@@ -19,7 +22,7 @@ RAIZ = Path(__file__).parent
 DOCS = RAIZ / "docs"
 ARCHIVO = DOCS / "archivo"
 TZ = ZoneInfo("America/Santiago")
-UA = "Mozilla/5.0 (compatible; MiBoletin/1.0)"
+UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 DIAS_ARCHIVO = 14
 
 DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
@@ -27,23 +30,63 @@ MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
          "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
 SISTEMA = (
-    "Eres el editor de un boletín matinal personal, en español de Chile. "
-    "Trabajas solo con el texto que se te entrega. Reglas: "
-    "1) No inventes datos, cifras, nombres ni contexto que no estén en el texto. "
-    "2) Si de una nota solo hay titular y no hay extracto, deja su resumen vacío (\"\"). "
-    "3) Atribuye las afirmaciones controvertidas a quien las hace o a la fuente. "
-    "4) Tono neutro y sobrio, sin adjetivos valorativos. "
-    "5) Si varias fuentes cubren el mismo hecho, elige solo la mejor nota. "
-    "6) Responde únicamente con JSON válido, sin texto adicional."
+    "Eres el editor jefe de un prestigioso diario matinal, en español. "
+    "Tu objetivo es seleccionar las noticias más trascendentes y redactar un resumen "
+    "y puntos clave objetivos, profundos y rigurosos. "
+    "Reglas estrictas:\n"
+    "1) No inventes datos, cifras, nombres ni contexto ausente en el texto entregado.\n"
+    "2) La primera nota elegida ([0]) será la PORTADA (noticia más relevante de la sección).\n"
+    "3) Atribuye afirmaciones controvertidas a su fuente o emisor.\n"
+    "4) Tono periodístico sobrio, culto y neutro.\n"
+    "5) Evita notas duplicadas sobre un mismo hecho.\n"
+    "6) Responde EXCLUSIVAMENTE con un JSON válido, sin preámbulo ni formato markdown."
 )
 
 
-# ---------- lectura de fuentes ----------
+# ---------- utilidades y lectura de fuentes ----------
 
 def limpiar(texto):
     texto = re.sub(r"<[^>]+>", " ", texto or "")
     texto = html.unescape(texto)
     return re.sub(r"\s+", " ", texto).strip()
+
+
+def id_nota(url, titulo):
+    cadena = f"{url}_{titulo}".strip()
+    return hashlib.md5(cadena.encode("utf-8")).hexdigest()[:10]
+
+
+def extraer_imagen(e):
+    """Extrae la URL de imagen destacada de una entrada RSS."""
+    for media in e.get("media_content", []):
+        url = media.get("url")
+        if url and (any(ext in url.lower() for ext in (".jpg", ".jpeg", ".png", ".webp"))
+                    or "image" in media.get("type", "")):
+            return url
+
+    for thumb in e.get("media_thumbnail", []):
+        if thumb.get("url"):
+            return thumb["url"]
+
+    for enc in e.get("enclosures", []):
+        url = enc.get("href") or enc.get("url")
+        if url and ("image" in enc.get("type", "")
+                    or any(ext in url.lower() for ext in (".jpg", ".jpeg", ".png", ".webp"))):
+            return url
+
+    for link in e.get("links", []):
+        if "image" in link.get("type", "") and link.get("href"):
+            return link["href"]
+
+    html_raw = (e.get("summary") or e.get("description")
+                or (e.get("content", [{}])[0].get("value") if e.get("content") else "") or "")
+    m = re.search(r'<img[^>]+src=["\'](https?://[^"\']+)["\']', html_raw, re.I)
+    if m:
+        url = m.group(1)
+        if not any(bad in url.lower() for bad in ("1x1", "pixel", "tracker", "feedburner", "icon")):
+            return url
+
+    return ""
 
 
 def url_google(f):
@@ -100,6 +143,8 @@ def recolectar(seccion, aj, ahora, errores):
                 continue
             fuente = f["nombre"]
             extracto = ""
+            imagen = extraer_imagen(e)
+
             if es_google:
                 real = limpiar((e.get("source") or {}).get("title", ""))
                 if real and titulo.endswith(" - " + real):
@@ -109,14 +154,21 @@ def recolectar(seccion, aj, ahora, errores):
                 if f.get("busqueda") and real:
                     fuente = real
             else:
-                extracto = limpiar(e.get("summary") or e.get("description"))[:500]
-            notas.append({"titulo": titulo, "url": enlace, "fuente": fuente,
-                          "fecha": fecha, "extracto": extracto})
+                extracto = limpiar(e.get("summary") or e.get("description"))[:650]
+
+            notas.append({
+                "id": id_nota(enlace, titulo),
+                "titulo": titulo,
+                "url": enlace,
+                "fuente": fuente,
+                "fecha": fecha,
+                "extracto": extracto,
+                "imagen": imagen,
+            })
         notas.sort(key=lambda n: n["fecha"] or datetime.min.replace(tzinfo=timezone.utc),
                    reverse=True)
         por_fuente.append(notas[: aj["max_por_fuente"]])
 
-    # intercalar fuentes para que ninguna domine
     candidatas, i = [], 0
     while len(candidatas) < aj["max_candidatas"] and any(i < len(l) for l in por_fuente):
         for lista in por_fuente:
@@ -125,7 +177,6 @@ def recolectar(seccion, aj, ahora, errores):
         i += 1
     candidatas = candidatas[: aj["max_candidatas"]]
 
-    # quitar duplicados por enlace o título muy parecido
     unicas = []
     for n in candidatas:
         base = n["titulo"].lower()
@@ -137,41 +188,52 @@ def recolectar(seccion, aj, ahora, errores):
     return unicas
 
 
-# ---------- selección y resumen con IA ----------
+# ---------- selección y profundidad con IA ----------
 
 def con_ia(client, modelo, seccion, candidatas, n):
     lineas = []
     for i, c in enumerate(candidatas):
         extracto = c["extracto"] if c["extracto"] else "(solo titular)"
-        lineas.append(f"[{i}] ({c['fuente']}) {c['titulo']} | {extracto}")
+        tiene_foto = " [con foto]" if c["imagen"] else ""
+        lineas.append(f"[{i}]{tiene_foto} ({c['fuente']}) {c['titulo']} | {extracto}")
+
     prompt = (
         f"Sección: {seccion['nombre']}\n"
-        f"Criterio de relevancia: {' '.join(seccion['criterio'].split())}\n\n"
-        f"Elige las {n} notas más relevantes (menos si no hay tantas que valgan la pena), "
-        "ordenadas de mayor a menor importancia. Para cada una escribe un resumen de 1 o 2 "
-        "frases (máximo 220 caracteres) en español, aunque la nota original esté en otro idioma.\n"
-        'Formato exacto: {"seleccion":[{"id":0,"resumen":"..."}]}\n\n'
-        "Notas:\n" + "\n".join(lineas)
+        f"Criterio editorial: {' '.join(seccion['criterio'].split())}\n\n"
+        f"Selecciona las {n} noticias de mayor valor (menos si no hay suficientes), "
+        "ordenadas de mayor a menor relevancia.\n"
+        "La primera nota ([0]) será la PORTADA DESTACADA de la sección (preferir notas con foto si son relevantes).\n"
+        "Para cada nota devuelve:\n"
+        "- id: índice de la lista\n"
+        "- resumen: síntesis periodística elegante de 1 o 2 frases (máx 230 caracteres).\n"
+        "- puntos_clave: lista con 2 o 3 viñetas concisas que profundicen el contexto, cifras o consecuencias.\n\n"
+        'Formato exacto: {"seleccion":[{"id":0,"resumen":"...","puntos_clave":["...","..."]}]}\n\n'
+        "Candidatas:\n" + "\n".join(lineas)
     )
+
     resp = client.models.generate_content(
         model=modelo,
         contents=prompt,
         config={
             "system_instruction": SISTEMA,
-            "max_output_tokens": 2000,
+            "max_output_tokens": 2500,
             "response_mime_type": "application/json",
         },
     )
     texto = resp.text
     datos = json.loads(re.search(r"\{.*\}", texto, re.S).group(0))
+
     elegidas, vistos = [], set()
-    for s in datos["seleccion"]:
+    for idx_sel, s in enumerate(datos.get("seleccion", [])):
         i = s.get("id")
         if isinstance(i, int) and 0 <= i < len(candidatas) and i not in vistos:
             vistos.add(i)
             nota = dict(candidatas[i])
             nota["resumen"] = limpiar(s.get("resumen", ""))
+            nota["puntos_clave"] = [limpiar(p) for p in s.get("puntos_clave", []) if p]
+            nota["es_portada"] = (idx_sel == 0)
             elegidas.append(nota)
+
     if not elegidas:
         raise RuntimeError("la IA no devolvió notas válidas")
     return elegidas[:n]
@@ -179,14 +241,17 @@ def con_ia(client, modelo, seccion, candidatas, n):
 
 def sin_ia(candidatas, n):
     salida = []
-    for c in candidatas[:n]:
+    for idx, c in enumerate(candidatas[:n]):
         nota = dict(c)
-        nota["resumen"] = c["extracto"][:220].rsplit(" ", 1)[0] + "…" if len(c["extracto"]) > 220 else c["extracto"]
+        txt = c["extracto"]
+        nota["resumen"] = (txt[:220].rsplit(" ", 1)[0] + "…") if len(txt) > 220 else txt
+        nota["puntos_clave"] = [txt[220:450]] if len(txt) > 220 else []
+        nota["es_portada"] = (idx == 0)
         salida.append(nota)
     return salida
 
 
-# ---------- página ----------
+# ---------- diseño y renderizado (estilo prensa editorial) ----------
 
 def etiqueta_hora(dt, ahora):
     if not dt:
@@ -202,47 +267,500 @@ def etiqueta_hora(dt, ahora):
 
 
 def esc(t):
-    return html.escape(t, quote=True)
+    return html.escape(str(t), quote=True)
 
 
 CSS = """
-:root{--fondo:#E9EDF0;--tinta:#16212B;--apagado:#566472;--linea:#C5CED6;--acento:#2640C8;--visitado:#6B5B95}
-@media (prefers-color-scheme:dark){:root{--fondo:#10171D;--tinta:#E6EBEF;--apagado:#93A0AC;--linea:#27333D;--acento:#8EA2FF;--visitado:#B7A6E0}}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-body{margin:0;background:var(--fondo);color:var(--tinta);font:16px/1.5 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
-main,header.cab,footer{max-width:640px;margin:0 auto;padding-left:20px;padding-right:20px}
-header.cab{padding-top:36px;padding-bottom:18px}
-h1{font:600 clamp(32px,9vw,46px)/1.05 "Newsreader",Georgia,"Times New Roman",serif;letter-spacing:-.01em;margin:0 0 10px}
-.sub{margin:0;color:var(--apagado);font-size:14px}
-nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--fondo) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--linea)}
-nav .fila{max-width:640px;margin:0 auto;padding:10px 20px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
-nav .fila::-webkit-scrollbar{display:none}
-nav a{flex:none;display:flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--linea);border-radius:999px;color:var(--tinta);text-decoration:none;font-size:14px;white-space:nowrap}
-.punto{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
-section{padding-top:34px;scroll-margin-top:56px}
-h2{display:flex;align-items:center;gap:10px;margin:0 0 6px;font:600 25px/1.2 "Newsreader",Georgia,serif}
-h2 .cuenta{margin-left:auto;font:400 14px "Public Sans",system-ui,sans-serif;color:var(--apagado)}
-.nota{padding:18px 0;border-top:1px solid var(--linea)}
-.nota h3{margin:0 0 6px;font:500 20px/1.28 "Newsreader",Georgia,serif}
-.nota h3 a{color:var(--tinta);text-decoration:none}
-.nota h3 a:visited{color:var(--visitado)}
-.nota h3 a:hover{text-decoration:underline;text-decoration-color:var(--acento)}
-a:focus-visible{outline:3px solid var(--acento);outline-offset:3px;border-radius:4px}
-.res{margin:0 0 8px;color:var(--tinta);opacity:.86;font-size:15px}
-.meta{margin:0;display:flex;gap:14px;font-size:13px;color:var(--apagado)}
-.meta .fuente{font-weight:600;color:var(--tinta);opacity:.8}
-.vacio{padding:18px 0;border-top:1px solid var(--linea);color:var(--apagado);font-size:15px}
-footer{padding-top:48px;padding-bottom:64px}
-.fin{font:600 30px/1.15 "Newsreader",Georgia,serif;margin:0 0 6px}
-.fin-sub{margin:0 0 28px;color:var(--apagado);font-size:14px}
-footer h4{margin:22px 0 8px;font-size:14px;font-weight:600}
-footer ul{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px}
-footer a{color:var(--acento)}
-details{margin-top:22px;font-size:13px;color:var(--apagado)}
-details summary{cursor:pointer}
-details li{display:block;margin-top:4px}
+:root {
+  --papel: #FBF9F5;
+  --papel-tarjeta: #FFFFFF;
+  --tinta: #181818;
+  --tinta-suave: #4A4843;
+  --apagado: #78756F;
+  --linea: #DDD7CA;
+  --linea-fuerte: #181818;
+  --acento: #9E2A2B;
+  --dorado: #C98A12;
+  --sombra: rgba(0,0,0,0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --papel: #141517;
+    --papel-tarjeta: #1B1D20;
+    --tinta: #EAE6DF;
+    --tinta-suave: #BBB6AD;
+    --apagado: #8C8880;
+    --linea: #2E3238;
+    --linea-fuerte: #EAE6DF;
+    --acento: #E57373;
+    --dorado: #E5A93C;
+    --sombra: rgba(0,0,0,0.3);
+  }
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font: 16px/1.6 "Newsreader", Georgia, "Times New Roman", serif;
+}
+
+.contenedor {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Cabecera estilo periódico clásico */
+.masthead {
+  padding-top: 28px;
+  padding-bottom: 14px;
+  border-bottom: 3px double var(--linea-fuerte);
+}
+.masthead-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 600 11px/1.2 "Inter", system-ui, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--apagado);
+  border-bottom: 1px solid var(--linea);
+  padding-bottom: 6px;
+  margin-bottom: 14px;
+}
+.masthead-title {
+  text-align: center;
+  margin: 10px 0 4px;
+  font: 900 clamp(38px, 8vw, 76px)/0.95 "Playfair Display", Georgia, serif;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.masthead-sub {
+  text-align: center;
+  font: italic 15px/1.3 "Newsreader", Georgia, serif;
+  color: var(--tinta-suave);
+  margin: 0 0 12px;
+}
+
+/* Barra de navegación de secciones */
+nav.secciones-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--papel) 94%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--linea);
+}
+.nav-fila {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 10px 0;
+  scrollbar-width: none;
+}
+.nav-fila::-webkit-scrollbar { display: none; }
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font: 600 12px "Inter", sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--tinta);
+  text-decoration: none;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.nav-link:hover { border-color: var(--tinta); background: var(--papel-tarjeta); }
+.punto { width: 8px; height: 8px; border-radius: 50%; }
+
+/* Secciones y Grilla Editorial */
+section.seccion-bloque {
+  padding-top: 36px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--linea);
+}
+.seccion-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--linea-fuerte);
+  padding-bottom: 6px;
+  margin-bottom: 22px;
+}
+.seccion-titulo {
+  font: 700 28px/1.1 "Playfair Display", Georgia, serif;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.seccion-cuenta {
+  font: 500 13px "Inter", sans-serif;
+  color: var(--apagado);
+}
+
+.editorial-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+}
+
+/* Tarjetas de noticias */
+.nota-card {
+  position: relative;
+  background: var(--papel-tarjeta);
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  grid-column: span 6;
+}
+@media (max-width: 768px) {
+  .nota-card { grid-column: span 12 !important; }
+}
+@media (min-width: 992px) {
+  .nota-card:not(.nota-portada) { grid-column: span 4; }
+}
+
+/* Portada / Lead Story */
+.nota-portada {
+  grid-column: span 12 !important;
+  background: var(--papel-tarjeta);
+  border-top: 4px solid var(--linea-fuerte);
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 768px) {
+  .nota-portada.con-foto {
+    grid-template-columns: 1.15fr 1fr;
+    align-items: start;
+  }
+}
+.nota-portada .nota-titulo {
+  font: 700 clamp(24px, 4vw, 34px)/1.15 "Playfair Display", Georgia, serif;
+  margin-bottom: 12px;
+}
+.nota-portada .nota-resumen::first-letter {
+  font: bold 3.2em/0.8 "Playfair Display", Georgia, serif;
+  float: left;
+  margin: 4px 8px 0 0;
+  color: var(--tinta);
+}
+
+/* Fotos periodísticas */
+.foto-contenedor {
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--linea);
+  margin-bottom: 14px;
+}
+.foto-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.nota-card:hover .foto-img { transform: scale(1.02); }
+
+/* Tipografía de notas */
+.nota-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 600 11px/1 "Inter", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--apagado);
+  margin-bottom: 10px;
+  padding-right: 28px;
+}
+.nota-fuente { color: var(--acento); font-weight: 700; }
+.nota-titulo {
+  font: 600 20px/1.25 "Playfair Display", Georgia, serif;
+  margin: 0 0 10px;
+}
+.nota-titulo a {
+  color: var(--tinta);
+  text-decoration: none;
+}
+.nota-titulo a:hover { text-decoration: underline; }
+.nota-resumen {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--tinta-suave);
+  margin: 0 0 14px;
+}
+
+/* Menú de 3 puntos interactivo */
+.menu-pos {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+}
+.btn-tres-puntos {
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--apagado);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.btn-tres-puntos:hover { background: var(--linea); color: var(--tinta); }
+.menu-desplegable {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background: var(--papel-tarjeta);
+  border: 1px solid var(--linea);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px var(--sombra);
+  padding: 12px;
+  min-width: 210px;
+  z-index: 20;
+}
+.menu-desplegable.activo { display: block; }
+.menu-label {
+  font: 600 11px "Inter", sans-serif;
+  text-transform: uppercase;
+  color: var(--apagado);
+  margin-bottom: 6px;
+}
+.estrellas {
+  display: flex;
+  gap: 4px;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--linea);
+  user-select: none;
+  margin-bottom: 10px;
+}
+.estrellas span:hover,
+.estrellas span.activo { color: var(--dorado); }
+.btn-eliminar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: none;
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  font: 500 12px "Inter", sans-serif;
+  color: #C8374A;
+  cursor: pointer;
+}
+.btn-eliminar:hover { background: rgba(200,55,74,0.08); }
+
+/* Desplegable de profundidad */
+.btn-profundizar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  font: 600 12px "Inter", sans-serif;
+  color: var(--tinta);
+  cursor: pointer;
+  margin-top: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.btn-profundizar:hover { color: var(--acento); }
+.flecha-rotar { transition: transform 0.25s ease; display: inline-block; }
+.flecha-rotar.abierto { transform: rotate(180deg); }
+
+.caja-profundidad {
+  display: none;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--linea);
+  font-size: 14px;
+  color: var(--tinta);
+}
+.caja-profundidad.visible { display: block; animation: fadeIn 0.3s ease; }
+.puntos-lista {
+  margin: 0 0 12px;
+  padding-left: 18px;
+}
+.puntos-lista li { margin-bottom: 6px; }
+.btn-leer-origen {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 600 12px "Inter", sans-serif;
+  color: var(--acento);
+  text-decoration: none;
+}
+.btn-leer-origen:hover { text-decoration: underline; }
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-out {
+  opacity: 0 !important;
+  transform: scale(0.95);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+/* Pie de página y panel de preferencias */
+footer.pie-editorial {
+  padding: 48px 0 80px;
+  border-top: 3px double var(--linea-fuerte);
+  margin-top: 48px;
+  text-align: center;
+}
+.pie-fin { font: 700 28px/1.2 "Playfair Display", Georgia, serif; margin: 0 0 8px; }
+.pie-sub { color: var(--apagado); font-size: 14px; margin: 0 0 24px; }
+.btn-preferencias {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--papel-tarjeta);
+  border: 1px solid var(--linea-fuerte);
+  border-radius: 999px;
+  font: 600 13px "Inter", sans-serif;
+  color: var(--tinta);
+  cursor: pointer;
+}
+.btn-preferencias:hover { background: var(--tinta); color: var(--papel); }
+
+/* Toast flotante */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--tinta);
+  color: var(--papel);
+  padding: 10px 18px;
+  border-radius: 8px;
+  font: 500 13px "Inter", sans-serif;
+  box-shadow: 0 4px 16px var(--sombra);
+  display: none;
+  z-index: 999;
+}
+"""
+
+JS = """
+const STORAGE_RATINGS = 'boletin_ratings_v1';
+const STORAGE_DISMISSED = 'boletin_dismissed_v1';
+
+function obtenerRatings() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_RATINGS) || '{}'); }
+  catch(e) { return {}; }
+}
+
+function obtenerDismissed() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_DISMISSED) || '[]'); }
+  catch(e) { return []; }
+}
+
+function mostrarToast(msg) {
+  const t = document.getElementById('toast');
+  if(!t) return;
+  t.innerText = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 2200);
+}
+
+function toggleMenu(btn, e) {
+  e.stopPropagation();
+  const menu = btn.nextElementSibling;
+  document.querySelectorAll('.menu-desplegable.activo').forEach(m => {
+    if(m !== menu) m.classList.remove('activo');
+  });
+  menu.classList.toggle('activo');
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.menu-desplegable.activo').forEach(m => m.classList.remove('activo'));
+});
+
+function calificar(id, estrellas) {
+  const ratings = obtenerRatings();
+  ratings[id] = estrellas;
+  localStorage.setItem(STORAGE_RATINGS, JSON.stringify(ratings));
+  actualizarEstrellasUI(id, estrellas);
+  mostrarToast(`Guardada: ${estrellas} estrella(s) ⭐`);
+}
+
+function actualizarEstrellasUI(id, estrellas) {
+  const cont = document.querySelector(`.estrellas[data-id="${id}"]`);
+  if (!cont) return;
+  const spans = cont.querySelectorAll('span');
+  spans.forEach((s, idx) => {
+    s.classList.toggle('activo', idx < estrellas);
+  });
+}
+
+function eliminarNota(id) {
+  const card = document.getElementById(`card-${id}`);
+  if (!card) return;
+  card.classList.add('fade-out');
+  setTimeout(() => {
+    card.style.display = 'none';
+  }, 300);
+  const dismissed = obtenerDismissed();
+  if(!dismissed.includes(id)) {
+    dismissed.push(id);
+    localStorage.setItem(STORAGE_DISMISSED, JSON.stringify(dismissed));
+  }
+  mostrarToast('Nota eliminada de tu feed');
+}
+
+function toggleProfundidad(id) {
+  const caja = document.getElementById(`prof-${id}`);
+  const flecha = document.getElementById(`flecha-${id}`);
+  if(!caja) return;
+  const abierta = caja.classList.toggle('visible');
+  if(flecha) flecha.classList.toggle('abierto', abierta);
+}
+
+function verPreferencias() {
+  const ratings = obtenerRatings();
+  const dismissed = obtenerDismissed();
+  const totalNotas = Object.keys(ratings).length;
+  alert(
+    `📊 Tus preferencias guardadas:\\n\\n` +
+    `• Noticias calificadas con estrellas: ${totalNotas}\\n` +
+    `• Noticias descartadas de tu feed: ${dismissed.length}\\n\\n` +
+    `¡Gemini utilizará este historial para afinar la selección en tus próximas ediciones!`
+  );
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const dismissed = obtenerDismissed();
+  dismissed.forEach(id => {
+    const card = document.getElementById(`card-${id}`);
+    if(card) card.style.display = 'none';
+  });
+
+  const ratings = obtenerRatings();
+  Object.keys(ratings).forEach(id => {
+    actualizarEstrellasUI(id, ratings[id]);
+  });
+});
 """
 
 PAGINA = """<!doctype html>
@@ -250,29 +768,53 @@ PAGINA = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#E9EDF0" media="(prefers-color-scheme:light)">
-<meta name="theme-color" content="#10171D" media="(prefers-color-scheme:dark)">
-<title>Boletín del {{TITULO}}</title>
+<title>El Boletín — {{TITULO}}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
 <style>{{CSS}}</style>
 </head>
 <body>
-<header class="cab">
-<h1>{{FECHA}}</h1>
-<p class="sub">{{SUBTITULO}}</p>
+
+<header class="masthead">
+  <div class="contenedor">
+    <div class="masthead-top">
+      <span>Santiago de Chile</span>
+      <span>{{FECHA}}</span>
+      <span>Edición Matinal</span>
+    </div>
+    <h1 class="masthead-title">El Boletín</h1>
+    <p class="masthead-sub">Curaduría matinal independiente &bull; {{SUBTITULO}}</p>
+  </div>
 </header>
-<nav><div class="fila">{{NAV}}</div></nav>
-<main>
+
+<nav class="secciones-nav">
+  <div class="contenedor">
+    <div class="nav-fila">{{NAV}}</div>
+  </div>
+</nav>
+
+<main class="contenedor">
 {{SECCIONES}}
 </main>
-<footer>
-<p class="fin">Eso es todo por hoy.</p>
-<p class="fin-sub">La próxima edición sale mañana temprano.</p>
-{{ARCHIVO}}
-{{ERRORES}}
+
+<footer class="pie-editorial">
+  <div class="contenedor">
+    <p class="pie-fin">Eso es todo por hoy.</p>
+    <p class="pie-sub">La próxima edición saldrá mañana temprano.</p>
+    <div style="margin-bottom: 28px;">
+      <button class="btn-preferencias" onclick="verPreferencias()">
+        ⚙️ Ver mis notas y preferencias de IA
+      </button>
+    </div>
+    {{ARCHIVO}}
+    {{ERRORES}}
+  </div>
 </footer>
+
+<div id="toast"></div>
+
+<script>{{JS}}</script>
 </body>
 </html>
 """
@@ -280,54 +822,123 @@ PAGINA = """<!doctype html>
 
 def render(secciones, ahora, errores, fechas, en_archivo):
     local = ahora.astimezone(TZ)
-    total = sum(len(s["notas"]) for s in secciones)
-    nav, cuerpo = [], []
+    total_notas = sum(len(s["notas"]) for s in secciones)
+
+    nav = []
+    cuerpo = []
+
     for s in secciones:
         punto = f'<span class="punto" style="background:{esc(s["color"])}"></span>'
-        nav.append(f'<a href="#{esc(s["id"])}">{punto}{esc(s["nombre"])}</a>')
-        partes = [f'<section id="{esc(s["id"])}"><h2>{punto}{esc(s["nombre"])}'
-                  f'<span class="cuenta">{len(s["notas"])}</span></h2>']
+        nav.append(f'<a href="#{esc(s["id"])}" class="nav-link">{punto}{esc(s["nombre"])}</a>')
+
+        bloque = [
+            f'<section id="{esc(s["id"])}" class="seccion-bloque">',
+            f'<div class="seccion-header">',
+            f'<h2 class="seccion-titulo">{punto}{esc(s["nombre"])}</h2>',
+            f'<span class="seccion-cuenta">{len(s["notas"])} notas</span>',
+            f'</div>',
+            f'<div class="editorial-grid">',
+        ]
+
         if not s["notas"]:
-            partes.append('<p class="vacio">Sin notas relevantes en las últimas horas.</p>')
+            bloque.append('<p style="grid-column: 1/-1; color: var(--apagado);">Sin notas relevantes en esta sección hoy.</p>')
+
         for n in s["notas"]:
-            partes.append('<article class="nota">'
-                          f'<h3><a href="{esc(n["url"])}" rel="noopener">{esc(n["titulo"])}</a></h3>')
-            if n.get("resumen"):
-                partes.append(f'<p class="res">{esc(n["resumen"])}</p>')
-            partes.append('<p class="meta">'
-                          f'<span class="fuente">{esc(n["fuente"])}</span>'
-                          f'<span>{esc(etiqueta_hora(n["fecha"], ahora))}</span></p></article>')
-        partes.append("</section>")
-        cuerpo.append("".join(partes))
+            es_portada = n.get("es_portada", False)
+            clase_portada = "nota-portada con-foto" if (es_portada and n.get("imagen")) else ("nota-portada" if es_portada else "")
+            
+            foto_html = ""
+            if n.get("imagen"):
+                foto_html = f'''
+                <div class="foto-contenedor">
+                  <img src="{esc(n["imagen"])}" alt="{esc(n["titulo"])}" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>'''
+
+            puntos_html = ""
+            if n.get("puntos_clave"):
+                items = "".join(f"<li>{esc(p)}</li>" for p in n["puntos_clave"])
+                puntos_html = f'<ul class="puntos-lista">{items}</ul>'
+
+            bloque.append(f'''
+            <article class="nota-card {clase_portada}" id="card-{esc(n["id"])}">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="{esc(n["id"])}">
+                    <span onclick="calificar('{esc(n["id"])}', 1)">★</span>
+                    <span onclick="calificar('{esc(n["id"])}', 2)">★</span>
+                    <span onclick="calificar('{esc(n["id"])}', 3)">★</span>
+                    <span onclick="calificar('{esc(n["id"])}', 4)">★</span>
+                    <span onclick="calificar('{esc(n["id"])}', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('{esc(n["id"])}')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              {foto_html if (es_portada and n.get("imagen")) else ""}
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">{esc(n["fuente"])}</span>
+                  <span>{esc(etiqueta_hora(n["fecha"], ahora))}</span>
+                </div>
+
+                {foto_html if (not es_portada and n.get("imagen")) else ""}
+
+                <h3 class="nota-titulo">
+                  <a href="{esc(n["url"])}" target="_blank" rel="noopener">{esc(n["titulo"])}</a>
+                </h3>
+
+                <p class="nota-resumen">{esc(n.get("resumen", ""))}</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('{esc(n["id"])}')">
+                  <span>Profundizar nota</span> <span id="flecha-{esc(n["id"])}" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-{esc(n["id"])}" class="caja-profundidad">
+                  {puntos_html}
+                  <a href="{esc(n["url"])}" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en {esc(n["fuente"])} ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            ''')
+
+        bloque.append('</div></section>')
+        cuerpo.append("".join(bloque))
 
     base = "" if en_archivo else "archivo/"
-    inicio = f'<li><a href="{"../" if en_archivo else ""}index.html">Edición de hoy</a></li>'
+    inicio = f'<li style="display:inline-block; margin-right:12px;"><a href="{"../" if en_archivo else ""}index.html" style="color:var(--acento);">Edición de hoy</a></li>'
     enlaces = "".join(
-        f'<li><a href="{base}{f}.html">{int(f[8:])} {MESES[int(f[5:7]) - 1][:3]}</a></li>'
+        f'<li style="display:inline-block; margin-right:12px;"><a href="{base}{f}.html" style="color:var(--tinta-suave);">{int(f[8:])} {MESES[int(f[5:7]) - 1][:3]}</a></li>'
         for f in fechas)
-    archivo = f"<h4>Ediciones anteriores</h4><ul>{inicio}{enlaces}</ul>"
+    archivo = f'<div style="margin-top:24px;"><h4 style="font:600 13px Inter,sans-serif; text-transform:uppercase; margin-bottom:8px; color:var(--apagado);">Ediciones anteriores</h4><ul style="list-style:none; padding:0; margin:0;">{inicio}{enlaces}</ul></div>'
 
     if errores:
         items = "".join(f"<li>{esc(e)}</li>" for e in errores)
-        err = f"<details><summary>{len(errores)} fuente(s) con problemas</summary><ul>{items}</ul></details>"
+        err = f'<details style="margin-top:20px; font-size:13px; color:var(--apagado);"><summary>{len(errores)} aviso(s) de fuentes</summary><ul>{items}</ul></details>'
     else:
         err = ""
 
-    fecha_txt = f"{DIAS[local.weekday()]} {local.day} de {MESES[local.month - 1]}"
+    fecha_txt = f"{DIAS[local.weekday()].capitalize()}, {local.day} de {MESES[local.month - 1]} de {local.year}"
+
     return (PAGINA
             .replace("{{CSS}}", CSS)
+            .replace("{{JS}}", JS)
             .replace("{{TITULO}}", f"{local.day} de {MESES[local.month - 1]}")
             .replace("{{FECHA}}", esc(fecha_txt))
-            .replace("{{SUBTITULO}}",
-                     f"Actualizado a las {local.strftime('%H:%M')}. "
-                     f"{total} notas en {len(secciones)} secciones.")
+            .replace("{{SUBTITULO}}", f"{total_notas} notas seleccionadas en {len(secciones)} secciones")
             .replace("{{NAV}}", "".join(nav))
             .replace("{{SECCIONES}}", "\n".join(cuerpo))
             .replace("{{ARCHIVO}}", archivo)
             .replace("{{ERRORES}}", err))
 
 
-# ---------- ejecución ----------
+# ---------- ejecución principal ----------
 
 def main():
     socket.setdefaulttimeout(20)
@@ -377,7 +988,7 @@ def main():
     (ARCHIVO / f"{hoy}.html").write_text(render(secciones, ahora, errores, fechas, True), encoding="utf-8")
     (DOCS / ".nojekyll").write_text("", encoding="utf-8")
 
-    print(f"Listo: {sum(len(s['notas']) for s in secciones)} notas, {len(errores)} aviso(s).")
+    print(f"Listo: {sum(len(s['notas']) for s in secciones)} notas procesadas con éxito.")
     for e in errores:
         print(" -", e)
 
