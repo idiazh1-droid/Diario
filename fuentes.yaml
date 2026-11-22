@@ -44,19 +44,19 @@ secciones:
     fuentes:
       - nombre: Cámara de Diputados
         dominio: camara.cl
-        busqueda: site:camara.cl "proyecto" OR "ley" OR "comisión" OR "sala"
+        busqueda: 'site:camara.cl "proyecto" OR "ley" OR "comisión" OR "sala"'
       - nombre: Senado de Chile
         dominio: senado.cl
-        busqueda: site:senado.cl "proyecto" OR "ley" OR "comisión" OR "tabla"
+        busqueda: 'site:senado.cl "proyecto" OR "ley" OR "comisión" OR "tabla"'
       - nombre: Diario Oficial / Leyes
-        busqueda: "Diario Oficial" Chile ley OR promulga OR "publicada"
+        busqueda: '"Diario Oficial" Chile ley OR promulga OR "publicada"'
       - nombre: CIPER Chile
         url: https://www.ciperchile.cl/feed/
         dominio: ciperchile.cl
       - nombre: El Mercurio
         dominio: elmercurio.com
       - nombre: Prensa Congreso
-        busqueda: "Cámara de Diputados" OR "Senado" Chile "proyecto de ley"
+        busqueda: '"Cámara de Diputados" OR "Senado" Chile "proyecto de ley"'
 
   - id: ambiente
     nombre: Medioambiente
@@ -79,7 +79,7 @@ secciones:
       - nombre: El Mercurio
         dominio: elmercurio.com
       - nombre: Google News Medioambiente
-        busqueda: medio ambiente Chile OR glaciares OR litio OR sequía
+        busqueda: 'medio ambiente Chile OR glaciares OR litio OR sequía'
 
   - id: mundo
     nombre: Geopolítica
