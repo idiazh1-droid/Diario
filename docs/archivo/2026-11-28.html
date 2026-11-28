@@ -1,0 +1,2611 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El Boletín — 28 de noviembre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --papel: #FBF9F5;
+  --papel-tarjeta: #FFFFFF;
+  --tinta: #181818;
+  --tinta-suave: #4A4843;
+  --apagado: #78756F;
+  --linea: #DDD7CA;
+  --linea-fuerte: #181818;
+  --acento: #9E2A2B;
+  --dorado: #C98A12;
+  --sombra: rgba(0,0,0,0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --papel: #141517;
+    --papel-tarjeta: #1B1D20;
+    --tinta: #EAE6DF;
+    --tinta-suave: #BBB6AD;
+    --apagado: #8C8880;
+    --linea: #2E3238;
+    --linea-fuerte: #EAE6DF;
+    --acento: #E57373;
+    --dorado: #E5A93C;
+    --sombra: rgba(0,0,0,0.3);
+  }
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font: 16px/1.65 "Newsreader", Georgia, "Times New Roman", serif;
+}
+
+.contenedor {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Cabecera estilo periódico clásico */
+.masthead {
+  padding-top: 28px;
+  padding-bottom: 14px;
+  border-bottom: 3px double var(--linea-fuerte);
+}
+.masthead-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 600 11px/1.2 "Inter", system-ui, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--apagado);
+  border-bottom: 1px solid var(--linea);
+  padding-bottom: 6px;
+  margin-bottom: 14px;
+}
+.masthead-title {
+  text-align: center;
+  margin: 10px 0 4px;
+  font: 900 clamp(38px, 8vw, 76px)/0.95 "Playfair Display", Georgia, serif;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.masthead-sub {
+  text-align: center;
+  font: italic 15px/1.3 "Newsreader", Georgia, serif;
+  color: var(--tinta-suave);
+  margin: 0 0 12px;
+}
+
+/* Barra de navegación de secciones */
+nav.secciones-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--papel) 94%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--linea);
+}
+.nav-fila {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 10px 0;
+  scrollbar-width: none;
+}
+.nav-fila::-webkit-scrollbar { display: none; }
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font: 600 12px "Inter", sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--tinta);
+  text-decoration: none;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.nav-link:hover { border-color: var(--tinta); background: var(--papel-tarjeta); }
+.punto { width: 8px; height: 8px; border-radius: 50%; }
+
+/* Secciones y Grilla Editorial */
+section.seccion-bloque {
+  padding-top: 36px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--linea);
+}
+.seccion-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--linea-fuerte);
+  padding-bottom: 6px;
+  margin-bottom: 22px;
+}
+.seccion-titulo {
+  font: 700 28px/1.1 "Playfair Display", Georgia, serif;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.seccion-cuenta {
+  font: 500 13px "Inter", sans-serif;
+  color: var(--apagado);
+}
+
+.editorial-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+}
+
+/* Tarjetas de noticias */
+.nota-card {
+  position: relative;
+  background: var(--papel-tarjeta);
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  grid-column: span 6;
+}
+@media (max-width: 768px) {
+  .nota-card { grid-column: span 12 !important; }
+}
+@media (min-width: 992px) {
+  .nota-card:not(.nota-portada) { grid-column: span 4; }
+}
+
+/* Portada / Lead Story */
+.nota-portada {
+  grid-column: span 12 !important;
+  background: var(--papel-tarjeta);
+  border-top: 4px solid var(--linea-fuerte);
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 768px) {
+  .nota-portada.con-foto {
+    grid-template-columns: 1.15fr 1fr;
+    align-items: start;
+  }
+}
+.nota-portada .nota-titulo {
+  font: 700 clamp(24px, 4vw, 34px)/1.15 "Playfair Display", Georgia, serif;
+  margin-bottom: 12px;
+}
+.nota-portada .nota-resumen::first-letter {
+  font: bold 3.2em/0.8 "Playfair Display", Georgia, serif;
+  float: left;
+  margin: 4px 8px 0 0;
+  color: var(--tinta);
+}
+
+/* Fotos periodísticas */
+.foto-contenedor {
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--linea);
+  margin-bottom: 14px;
+}
+.foto-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+.nota-card:hover .foto-img { transform: scale(1.02); }
+
+/* Tipografía de notas */
+.nota-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 600 11px/1 "Inter", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--apagado);
+  margin-bottom: 10px;
+  padding-right: 28px;
+}
+.nota-fuente { color: var(--acento); font-weight: 700; }
+.nota-titulo {
+  font: 600 20px/1.25 "Playfair Display", Georgia, serif;
+  margin: 0 0 10px;
+}
+.nota-titulo a {
+  color: var(--tinta);
+  text-decoration: none;
+}
+.nota-titulo a:hover { text-decoration: underline; }
+.nota-resumen {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--tinta-suave);
+  margin: 0 0 14px;
+}
+
+/* Menú de 3 puntos interactivo */
+.menu-pos {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+}
+.btn-tres-puntos {
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--apagado);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.btn-tres-puntos:hover { background: var(--linea); color: var(--tinta); }
+.menu-desplegable {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background: var(--papel-tarjeta);
+  border: 1px solid var(--linea);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px var(--sombra);
+  padding: 12px;
+  min-width: 210px;
+  z-index: 20;
+}
+.menu-desplegable.activo { display: block; }
+.menu-label {
+  font: 600 11px "Inter", sans-serif;
+  text-transform: uppercase;
+  color: var(--apagado);
+  margin-bottom: 6px;
+}
+.estrellas {
+  display: flex;
+  gap: 4px;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--linea);
+  user-select: none;
+  margin-bottom: 10px;
+}
+.estrellas span:hover,
+.estrellas span.activo { color: var(--dorado); }
+.btn-eliminar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: none;
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  font: 500 12px "Inter", sans-serif;
+  color: #C8374A;
+  cursor: pointer;
+}
+.btn-eliminar:hover { background: rgba(200,55,74,0.08); }
+
+/* Desplegable de profundidad */
+.btn-profundizar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  font: 600 12px "Inter", sans-serif;
+  color: var(--tinta);
+  cursor: pointer;
+  margin-top: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.btn-profundizar:hover { color: var(--acento); }
+.flecha-rotar { transition: transform 0.25s ease; display: inline-block; }
+.flecha-rotar.abierto { transform: rotate(180deg); }
+
+.caja-profundidad {
+  display: none;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--linea);
+  font-size: 14px;
+  color: var(--tinta);
+}
+.caja-profundidad.visible { display: block; animation: fadeIn 0.3s ease; }
+.puntos-lista {
+  margin: 0 0 12px;
+  padding-left: 18px;
+}
+.puntos-lista li { margin-bottom: 6px; }
+.btn-leer-origen {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 600 12px "Inter", sans-serif;
+  color: var(--acento);
+  text-decoration: none;
+}
+.btn-leer-origen:hover { text-decoration: underline; }
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-out {
+  opacity: 0 !important;
+  transform: scale(0.95);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+/* Pie de página y panel de preferencias */
+footer.pie-editorial {
+  padding: 48px 0 80px;
+  border-top: 3px double var(--linea-fuerte);
+  margin-top: 48px;
+  text-align: center;
+}
+.pie-fin { font: 700 28px/1.2 "Playfair Display", Georgia, serif; margin: 0 0 8px; }
+.pie-sub { color: var(--apagado); font-size: 14px; margin: 0 0 24px; }
+.btn-preferencias {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--papel-tarjeta);
+  border: 1px solid var(--linea-fuerte);
+  border-radius: 999px;
+  font: 600 13px "Inter", sans-serif;
+  color: var(--tinta);
+  cursor: pointer;
+}
+.btn-preferencias:hover { background: var(--tinta); color: var(--papel); }
+
+/* Toast flotante */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--tinta);
+  color: var(--papel);
+  padding: 10px 18px;
+  border-radius: 8px;
+  font: 500 13px "Inter", sans-serif;
+  box-shadow: 0 4px 16px var(--sombra);
+  display: none;
+  z-index: 999;
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="contenedor">
+    <div class="masthead-top">
+      <span>Santiago de Chile</span>
+      <span>Sábado, 28 de noviembre de 2026</span>
+      <span>Edición Matinal</span>
+    </div>
+    <h1 class="masthead-title">El Boletín</h1>
+    <p class="masthead-sub">Curaduría matinal independiente &bull; 43 notas seleccionadas en 6 secciones</p>
+  </div>
+</header>
+
+<nav class="secciones-nav">
+  <div class="contenedor">
+    <div class="nav-fila"><a href="#chile" class="nav-link"><span class="punto" style="background:#C8374A"></span>Chile</a><a href="#congreso" class="nav-link"><span class="punto" style="background:#8B1E3F"></span>Congreso Nacional</a><a href="#ambiente" class="nav-link"><span class="punto" style="background:#2E9B5F"></span>Medioambiente</a><a href="#mundo" class="nav-link"><span class="punto" style="background:#2A6FDB"></span>Geopolítica</a><a href="#cine" class="nav-link"><span class="punto" style="background:#C98A12"></span>Cine</a><a href="#tecnologia" class="nav-link"><span class="punto" style="background:#7A4FD6"></span>Tecnología</a></div>
+  </div>
+</nav>
+
+<main class="contenedor">
+<section id="chile" class="seccion-bloque"><div class="seccion-header"><h2 class="seccion-titulo"><span class="punto" style="background:#C8374A"></span>Chile</h2><span class="seccion-cuenta">11 notas</span></div><div class="editorial-grid">
+            <article class="nota-card nota-portada" id="card-d718193b0f">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="d718193b0f">
+                    <span onclick="calificar('d718193b0f', 1)">★</span>
+                    <span onclick="calificar('d718193b0f', 2)">★</span>
+                    <span onclick="calificar('d718193b0f', 3)">★</span>
+                    <span onclick="calificar('d718193b0f', 4)">★</span>
+                    <span onclick="calificar('d718193b0f', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('d718193b0f')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">El Mercurio</span>
+                  <span>ayer 11:22</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMif0FVX3lxTE04S0dzT2VzOS1yYlc3c3ByeDNoOXFsb29rRzNFS0RUYVNsSXB1QjdLaDIzNkZCdFFSenRPenpqQ2RKZENfU3NESk5RbWZObXIxSGhSams2T0VLSkVLcVBjN2tUTmh2em5vQ01wTk9HLXJ3a2JHSXhLUURUbExIdTA?oc=5" target="_blank" rel="noopener">Abstracto</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('d718193b0f')">
+                  <span>Profundizar nota</span> <span id="flecha-d718193b0f" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-d718193b0f" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMif0FVX3lxTE04S0dzT2VzOS1yYlc3c3ByeDNoOXFsb29rRzNFS0RUYVNsSXB1QjdLaDIzNkZCdFFSenRPenpqQ2RKZENfU3NESk5RbWZObXIxSGhSams2T0VLSkVLcVBjN2tUTmh2em5vQ01wTk9HLXJ3a2JHSXhLUURUbExIdTA?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en El Mercurio ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-eee45a212a">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="eee45a212a">
+                    <span onclick="calificar('eee45a212a', 1)">★</span>
+                    <span onclick="calificar('eee45a212a', 2)">★</span>
+                    <span onclick="calificar('eee45a212a', 3)">★</span>
+                    <span onclick="calificar('eee45a212a', 4)">★</span>
+                    <span onclick="calificar('eee45a212a', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('eee45a212a')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Las Últimas Noticias</span>
+                  <span>hoy 05:14</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxOMnJ3QzhPTG56ZUNCWmxOeHBNeXVqdzBROXgwczduaWpub09YZk9JUlZ2NHd4UXNYZnBRWWpieUdXckcteU5jdmdheV9LTzI3QU1qQVhDUFdlN2xIUFZCcDVpVDZFTnhiRFA5bkxQREk5SU5CT1FOT0FOVkdlTjNuUDdmQ2s2THBsMWFlQVNWaXN2SW9t?oc=5" target="_blank" rel="noopener">- LUN</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('eee45a212a')">
+                  <span>Profundizar nota</span> <span id="flecha-eee45a212a" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-eee45a212a" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxOMnJ3QzhPTG56ZUNCWmxOeHBNeXVqdzBROXgwczduaWpub09YZk9JUlZ2NHd4UXNYZnBRWWpieUdXckcteU5jdmdheV9LTzI3QU1qQVhDUFdlN2xIUFZCcDVpVDZFTnhiRFA5bkxQREk5SU5CT1FOT0FOVkdlTjNuUDdmQ2s2THBsMWFlQVNWaXN2SW9t?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Las Últimas Noticias ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-3231fb70cb">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="3231fb70cb">
+                    <span onclick="calificar('3231fb70cb', 1)">★</span>
+                    <span onclick="calificar('3231fb70cb', 2)">★</span>
+                    <span onclick="calificar('3231fb70cb', 3)">★</span>
+                    <span onclick="calificar('3231fb70cb', 4)">★</span>
+                    <span onclick="calificar('3231fb70cb', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('3231fb70cb')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">CIPER Chile</span>
+                  <span>ayer 21:58</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.ciperchile.cl/2026/11/27/podcast-chadwick-el-artista-del-caso-penta/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=podcast-chadwick-el-artista-del-caso-penta" target="_blank" rel="noopener">Podcast | Chadwick: el «artista» del caso Penta</a>
+                </h3>
+
+                <p class="nota-resumen">La entrada Podcast | Chadwick: el «artista» del caso Penta se publicó primero en CIPER Chile .</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('3231fb70cb')">
+                  <span>Profundizar nota</span> <span id="flecha-3231fb70cb" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-3231fb70cb" class="caja-profundidad">
+                  
+                  <a href="https://www.ciperchile.cl/2026/11/27/podcast-chadwick-el-artista-del-caso-penta/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=podcast-chadwick-el-artista-del-caso-penta" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en CIPER Chile ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-8b6674feaa">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="8b6674feaa">
+                    <span onclick="calificar('8b6674feaa', 1)">★</span>
+                    <span onclick="calificar('8b6674feaa', 2)">★</span>
+                    <span onclick="calificar('8b6674feaa', 3)">★</span>
+                    <span onclick="calificar('8b6674feaa', 4)">★</span>
+                    <span onclick="calificar('8b6674feaa', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('8b6674feaa')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">La Tercera</span>
+                  <span>hoy 04:41</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMitgFBVV95cUxQUTR6dWxkN3lyUGFHTW5mUWZ3M3VhdVlndEZoTmFYcEdieUhBcW9hcjZsUVdQbzVTdk13ODJWNXF0aGp4ZDZRMTctaEFHZ3ZKVGllT1lCaWpKODdLXzVmdHpFb0Q1dENWU2ctcnNCSFg3NmxLTVVJSDNqRkItakVoZS1JX0VxVzZWSWxhbFh6dDVnNnRPT3FsS3ZncVlQZ1JLMWZKTHZPUWg2SVhvVktJa0UyTWxZZ9IB1wFBVV95cUxQRUhUV2dEdWJ0Z2FWU1ppS1RCcHNFUW1hWnlFT3FBYlVVNkNWaS1tVVA1eVBWQ1N2MHQtLW4xUHEwUHJCekxjd2ROWUZxc0tIR1VxWk91bktad1pDWXJiZjl4WUJsblFzY2ZrbVZYbmhCUDZGekJtSnRybEdPN2ZGMTdXOTlRcXBRUFp3QWFnQUVpMl91Y2JRdjhlaW5pdGlFMnNSSy1mcjQyYk14WENON08yRTFEZHFjQ055YnZiTUtjU09hY2hienZPcGZ1QXVNekJHZE45RQ?oc=5" target="_blank" rel="noopener">Muere Gustavo Meza, destacado director teatral, dramaturgo y Premio Nacional</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('8b6674feaa')">
+                  <span>Profundizar nota</span> <span id="flecha-8b6674feaa" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-8b6674feaa" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMitgFBVV95cUxQUTR6dWxkN3lyUGFHTW5mUWZ3M3VhdVlndEZoTmFYcEdieUhBcW9hcjZsUVdQbzVTdk13ODJWNXF0aGp4ZDZRMTctaEFHZ3ZKVGllT1lCaWpKODdLXzVmdHpFb0Q1dENWU2ctcnNCSFg3NmxLTVVJSDNqRkItakVoZS1JX0VxVzZWSWxhbFh6dDVnNnRPT3FsS3ZncVlQZ1JLMWZKTHZPUWg2SVhvVktJa0UyTWxZZ9IB1wFBVV95cUxQRUhUV2dEdWJ0Z2FWU1ppS1RCcHNFUW1hWnlFT3FBYlVVNkNWaS1tVVA1eVBWQ1N2MHQtLW4xUHEwUHJCekxjd2ROWUZxc0tIR1VxWk91bktad1pDWXJiZjl4WUJsblFzY2ZrbVZYbmhCUDZGekJtSnRybEdPN2ZGMTdXOTlRcXBRUFp3QWFnQUVpMl91Y2JRdjhlaW5pdGlFMnNSSy1mcjQyYk14WENON08yRTFEZHFjQ055YnZiTUtjU09hY2hienZPcGZ1QXVNekJHZE45RQ?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en La Tercera ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-7b487d81f0">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="7b487d81f0">
+                    <span onclick="calificar('7b487d81f0', 1)">★</span>
+                    <span onclick="calificar('7b487d81f0', 2)">★</span>
+                    <span onclick="calificar('7b487d81f0', 3)">★</span>
+                    <span onclick="calificar('7b487d81f0', 4)">★</span>
+                    <span onclick="calificar('7b487d81f0', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('7b487d81f0')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">BioBioChile</span>
+                  <span>hoy 00:47</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMikAJBVV95cUxNbVVRanpoTjZFSDE5dEJDcXpYZEtnT19qd3dKLWtYNnhNWFhuSVR4bjNwZ21fa1hvVlFnek5yM2FaSDNXODY5c2doSVZiSUtwODltVWFFM0VCYTZjdXIwWjVTNzlRM0lxMU8zWk1xVWFUQ2F3NDMtb19xYkJfdU1HUDJHVVRRS1lhNzBtMVZPM0NncDlwMk51QXVSd3pCNnBHY3ZRQzlKVUZreHpJZTRjUUszU01LQnRjQW9fNlRTelRJYWR6VlpZMWtkLXNGSWdLb3BiaFhBelZjVjNkMFdXdXRLSnBDdHJqWVV0MUo4cUMxZjZMTUdDRE8yd0FTY2U4dHczQW1ESlZpcVdBZFZBUg?oc=5" target="_blank" rel="noopener">Ocho militares muertos y piloto sobreviviente tras la caída de helicóptero de la Fuerza Aérea de Perú</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('7b487d81f0')">
+                  <span>Profundizar nota</span> <span id="flecha-7b487d81f0" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-7b487d81f0" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMikAJBVV95cUxNbVVRanpoTjZFSDE5dEJDcXpYZEtnT19qd3dKLWtYNnhNWFhuSVR4bjNwZ21fa1hvVlFnek5yM2FaSDNXODY5c2doSVZiSUtwODltVWFFM0VCYTZjdXIwWjVTNzlRM0lxMU8zWk1xVWFUQ2F3NDMtb19xYkJfdU1HUDJHVVRRS1lhNzBtMVZPM0NncDlwMk51QXVSd3pCNnBHY3ZRQzlKVUZreHpJZTRjUUszU01LQnRjQW9fNlRTelRJYWR6VlpZMWtkLXNGSWdLb3BiaFhBelZjVjNkMFdXdXRLSnBDdHJqWVV0MUo4cUMxZjZMTUdDRE8yd0FTY2U4dHczQW1ESlZpcVdBZFZBUg?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en BioBioChile ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-22706f02cd">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="22706f02cd">
+                    <span onclick="calificar('22706f02cd', 1)">★</span>
+                    <span onclick="calificar('22706f02cd', 2)">★</span>
+                    <span onclick="calificar('22706f02cd', 3)">★</span>
+                    <span onclick="calificar('22706f02cd', 4)">★</span>
+                    <span onclick="calificar('22706f02cd', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('22706f02cd')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">CNN Chile</span>
+                  <span>ayer 23:14</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNN01XT2JGSEI0cWRVRjl6b0lhNEtMRTNvdnVjOTNWMlhscHlGcTAyV1Rwazl1em92WW1UaFpIcEw0bXpIU2E4b2hPcVhCZmlGeEx0dmNJM3M0a3h1dXJJME1xWlJ2ZGlBSDN3emp0Q1Fvc05raVlUUUhWZjNtQ3JyOHJmVUdtY0daZzlXU3RSdi1nS2NwMTJPaHNfdFY2NXAyZHc?oc=5" target="_blank" rel="noopener">FKA twigs en Chile: Una artista extraordinaria en todas sus facetas</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('22706f02cd')">
+                  <span>Profundizar nota</span> <span id="flecha-22706f02cd" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-22706f02cd" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNN01XT2JGSEI0cWRVRjl6b0lhNEtMRTNvdnVjOTNWMlhscHlGcTAyV1Rwazl1em92WW1UaFpIcEw0bXpIU2E4b2hPcVhCZmlGeEx0dmNJM3M0a3h1dXJJME1xWlJ2ZGlBSDN3emp0Q1Fvc05raVlUUUhWZjNtQ3JyOHJmVUdtY0daZzlXU3RSdi1nS2NwMTJPaHNfdFY2NXAyZHc?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en CNN Chile ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-d467a95f55">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="d467a95f55">
+                    <span onclick="calificar('d467a95f55', 1)">★</span>
+                    <span onclick="calificar('d467a95f55', 2)">★</span>
+                    <span onclick="calificar('d467a95f55', 3)">★</span>
+                    <span onclick="calificar('d467a95f55', 4)">★</span>
+                    <span onclick="calificar('d467a95f55', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('d467a95f55')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">La Tercera</span>
+                  <span>hoy 02:07</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMirgFBVV95cUxNOGpvSlF4YnF2dUFZY1FhR3VmeDctdDhkUUdVZzhhZzZySGpPZ1djMzZudmZqTGRBMExZNkU5V09Cd0hsTnBLZE1aakFJRjd2N3Z1YVh2Rkh2WHluWEVWZGQzQ0Q4X2lpWWNNSkNPVW5fTXB4Y1ZSbkZYdjFqODd0R0NtX1hJZHVWdmw4djd3YkpPd21yRXJPV2wzTlpCQjdwUVNUVzlGWTJOMDY2a2fSAc8BQVVfeXFMTUY3eEZyLXBDVEFSWGdPSmFseXdJdlc2RW91YlM0VThPOEdmc29BampnQ1B1WjliOVowNkdVTUxtRXhzU0JremY0YTNQMTVfQWtENktBRko0UzhyRzZFNWpLN2R3d0Z5Y2ZoMWRVZmtHTHFPaDhHUlk5Z3RwNWlvdXFrS1FqbEJvUHIzV3Zwd1ItTG0zVzZPN3pxUTdWaFNnTzl0TjRzamhGa3FLT2lyaHNyTERGeXBrTVp2aE0yU3lTZFdqa0tma3FnM3pzVzNj?oc=5" target="_blank" rel="noopener">Miles de trabajadores protestan en Bolivia por alto costo de la vida</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('d467a95f55')">
+                  <span>Profundizar nota</span> <span id="flecha-d467a95f55" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-d467a95f55" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMirgFBVV95cUxNOGpvSlF4YnF2dUFZY1FhR3VmeDctdDhkUUdVZzhhZzZySGpPZ1djMzZudmZqTGRBMExZNkU5V09Cd0hsTnBLZE1aakFJRjd2N3Z1YVh2Rkh2WHluWEVWZGQzQ0Q4X2lpWWNNSkNPVW5fTXB4Y1ZSbkZYdjFqODd0R0NtX1hJZHVWdmw4djd3YkpPd21yRXJPV2wzTlpCQjdwUVNUVzlGWTJOMDY2a2fSAc8BQVVfeXFMTUY3eEZyLXBDVEFSWGdPSmFseXdJdlc2RW91YlM0VThPOEdmc29BampnQ1B1WjliOVowNkdVTUxtRXhzU0JremY0YTNQMTVfQWtENktBRko0UzhyRzZFNWpLN2R3d0Z5Y2ZoMWRVZmtHTHFPaDhHUlk5Z3RwNWlvdXFrS1FqbEJvUHIzV3Zwd1ItTG0zVzZPN3pxUTdWaFNnTzl0TjRzamhGa3FLT2lyaHNyTERGeXBrTVp2aE0yU3lTZFdqa0tma3FnM3pzVzNj?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en La Tercera ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-0aa878a118">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="0aa878a118">
+                    <span onclick="calificar('0aa878a118', 1)">★</span>
+                    <span onclick="calificar('0aa878a118', 2)">★</span>
+                    <span onclick="calificar('0aa878a118', 3)">★</span>
+                    <span onclick="calificar('0aa878a118', 4)">★</span>
+                    <span onclick="calificar('0aa878a118', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('0aa878a118')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">BioBioChile</span>
+                  <span>ayer 23:38</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMi2AFBVV95cUxNdktiVFM3ZHNhdmNzTkg0M3dBTEZtRGpKaldlYUxURGZFTExxWkRENWdEaW1QbXdjWmtBSHBkb2QzSjR2cnRxZE43VTAwbFVmeDdiQVhNWnAwNWd1eEV6NTJ0TFk3d3kzT1ZxVUtUcVNxXzlncFdocmFaR0owMkU0X0VqMnNUQWZIWHUtblg0Yktzem5ZNE1aN3lqRGJZTU9SVkNEb3JuT0o4WGZ4VzVJNURuV3g4MlVoSUIwdktzbW1CdDJTTHc0VWxXQzM2UTFLVWlBUDZmRGI?oc=5" target="_blank" rel="noopener">Kast blinda a Rabat ante votación de AC: &quot;No ha cometido ninguna infracción&quot;</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('0aa878a118')">
+                  <span>Profundizar nota</span> <span id="flecha-0aa878a118" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-0aa878a118" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMi2AFBVV95cUxNdktiVFM3ZHNhdmNzTkg0M3dBTEZtRGpKaldlYUxURGZFTExxWkRENWdEaW1QbXdjWmtBSHBkb2QzSjR2cnRxZE43VTAwbFVmeDdiQVhNWnAwNWd1eEV6NTJ0TFk3d3kzT1ZxVUtUcVNxXzlncFdocmFaR0owMkU0X0VqMnNUQWZIWHUtblg0Yktzem5ZNE1aN3lqRGJZTU9SVkNEb3JuT0o4WGZ4VzVJNURuV3g4MlVoSUIwdktzbW1CdDJTTHc0VWxXQzM2UTFLVWlBUDZmRGI?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en BioBioChile ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-680525ad96">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="680525ad96">
+                    <span onclick="calificar('680525ad96', 1)">★</span>
+                    <span onclick="calificar('680525ad96', 2)">★</span>
+                    <span onclick="calificar('680525ad96', 3)">★</span>
+                    <span onclick="calificar('680525ad96', 4)">★</span>
+                    <span onclick="calificar('680525ad96', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('680525ad96')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">CNN Chile</span>
+                  <span>ayer 21:45</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMigAJBVV95cUxNTHdOcHdONjJLa1RYbjRSeUExRlZzSlRYNWpyTFdXUUcyTE5pVFJTSEJhRVJCVnpZX0VOYU9CMTEwNVdYeHp1YmxXUWlNREVKM0lsM1IzdmdxYk5NMGxpNWMxTkpXQWEtOVdRanlOdXo5VEpRQm9JN0FIdDByYlNxSzdYcTdWVjJVNGtMOEo4SEJUV3lmMG1fRl9GRUl2Ml9DTGt1OEN4Q2s2SkNnRU85WnN1TW9BMThDTDR0VnN6WTNKSkZseGVteVBxd0hsWGd6eWlXN3V5TkxfRThqX083YTRLNE1kZWlCTHdDU09PcHBaMmVDV3R4SnItWVNPeXc1?oc=5" target="_blank" rel="noopener">Presidente Kast defiende a ministro Rabat y pide rechazar acusación constitucional: “No ha cometido ninguna infracción legal ni constitucional”</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('680525ad96')">
+                  <span>Profundizar nota</span> <span id="flecha-680525ad96" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-680525ad96" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMigAJBVV95cUxNTHdOcHdONjJLa1RYbjRSeUExRlZzSlRYNWpyTFdXUUcyTE5pVFJTSEJhRVJCVnpZX0VOYU9CMTEwNVdYeHp1YmxXUWlNREVKM0lsM1IzdmdxYk5NMGxpNWMxTkpXQWEtOVdRanlOdXo5VEpRQm9JN0FIdDByYlNxSzdYcTdWVjJVNGtMOEo4SEJUV3lmMG1fRl9GRUl2Ml9DTGt1OEN4Q2s2SkNnRU85WnN1TW9BMThDTDR0VnN6WTNKSkZseGVteVBxd0hsWGd6eWlXN3V5TkxfRThqX083YTRLNE1kZWlCTHdDU09PcHBaMmVDV3R4SnItWVNPeXc1?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en CNN Chile ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-0145fa3f5e">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="0145fa3f5e">
+                    <span onclick="calificar('0145fa3f5e', 1)">★</span>
+                    <span onclick="calificar('0145fa3f5e', 2)">★</span>
+                    <span onclick="calificar('0145fa3f5e', 3)">★</span>
+                    <span onclick="calificar('0145fa3f5e', 4)">★</span>
+                    <span onclick="calificar('0145fa3f5e', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('0145fa3f5e')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">El Mercurio</span>
+                  <span>ayer 08:29</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMihwFBVV95cUxPZ0pwaHVNcnd2RzNpMjJRbF9icjM3Q3hueFN5dUhxbjN4WlgzUVRBVnRjWFYwb0xoOGhrbU1jb3VEMF9scnFNRE1MT1g1Z01nX2hyTjMyeVZtRVdDZTZsNTlnVWdxeGx5Ykt2ZkdJMlFGV2ZFRVoxbEhwN09VMi1pdG1HbEwySlk?oc=5" target="_blank" rel="noopener">¡América Latina tiene sed!</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('0145fa3f5e')">
+                  <span>Profundizar nota</span> <span id="flecha-0145fa3f5e" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-0145fa3f5e" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMihwFBVV95cUxPZ0pwaHVNcnd2RzNpMjJRbF9icjM3Q3hueFN5dUhxbjN4WlgzUVRBVnRjWFYwb0xoOGhrbU1jb3VEMF9scnFNRE1MT1g1Z01nX2hyTjMyeVZtRVdDZTZsNTlnVWdxeGx5Ykt2ZkdJMlFGV2ZFRVoxbEhwN09VMi1pdG1HbEwySlk?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en El Mercurio ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-67dc8f4a1b">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="67dc8f4a1b">
+                    <span onclick="calificar('67dc8f4a1b', 1)">★</span>
+                    <span onclick="calificar('67dc8f4a1b', 2)">★</span>
+                    <span onclick="calificar('67dc8f4a1b', 3)">★</span>
+                    <span onclick="calificar('67dc8f4a1b', 4)">★</span>
+                    <span onclick="calificar('67dc8f4a1b', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('67dc8f4a1b')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">CIPER Chile</span>
+                  <span>ayer 19:18</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.ciperchile.cl/2026/11/27/la-escritura-escolar-frente-a-la-fiebre-de-la-ia/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=la-escritura-escolar-frente-a-la-fiebre-de-la-ia" target="_blank" rel="noopener">La escritura escolar frente a la “fiebre” de la IA</a>
+                </h3>
+
+                <p class="nota-resumen">La entrada La escritura escolar frente a la “fiebre” de la IA se publicó primero en CIPER Chile .</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('67dc8f4a1b')">
+                  <span>Profundizar nota</span> <span id="flecha-67dc8f4a1b" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-67dc8f4a1b" class="caja-profundidad">
+                  
+                  <a href="https://www.ciperchile.cl/2026/11/27/la-escritura-escolar-frente-a-la-fiebre-de-la-ia/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=la-escritura-escolar-frente-a-la-fiebre-de-la-ia" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en CIPER Chile ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            </div></section>
+<section id="congreso" class="seccion-bloque"><div class="seccion-header"><h2 class="seccion-titulo"><span class="punto" style="background:#8B1E3F"></span>Congreso Nacional</h2><span class="seccion-cuenta">6 notas</span></div><div class="editorial-grid">
+            <article class="nota-card nota-portada" id="card-76d38e35ad">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="76d38e35ad">
+                    <span onclick="calificar('76d38e35ad', 1)">★</span>
+                    <span onclick="calificar('76d38e35ad', 2)">★</span>
+                    <span onclick="calificar('76d38e35ad', 3)">★</span>
+                    <span onclick="calificar('76d38e35ad', 4)">★</span>
+                    <span onclick="calificar('76d38e35ad', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('76d38e35ad')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Cámara de Diputadas y Diputados</span>
+                  <span>hoy 03:04</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMiiAFBVV95cUxPM2pUenF6aUdzQUdMdVJHWmR4Q085MnhmeTI3YzFYUUF6dnJYRU5ocG1SV3Z6dlBkcjE1M0QtX2E3ejdETmlzQjVnTzd3alV4RHhkaVRwZENfR014RVpVZzNsNk1uZkZPcHNYXzlpSkx3TERkelMwTE15bDhZS2k4NjI0R1o4Y2I3?oc=5" target="_blank" rel="noopener">Comisión de Gobierno Interior, Nacionalidad, Ciudadanía y Regionalización</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('76d38e35ad')">
+                  <span>Profundizar nota</span> <span id="flecha-76d38e35ad" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-76d38e35ad" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMiiAFBVV95cUxPM2pUenF6aUdzQUdMdVJHWmR4Q085MnhmeTI3YzFYUUF6dnJYRU5ocG1SV3Z6dlBkcjE1M0QtX2E3ejdETmlzQjVnTzd3alV4RHhkaVRwZENfR014RVpVZzNsNk1uZkZPcHNYXzlpSkx3TERkelMwTE15bDhZS2k4NjI0R1o4Y2I3?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Cámara de Diputadas y Diputados ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-394da5e76b">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="394da5e76b">
+                    <span onclick="calificar('394da5e76b', 1)">★</span>
+                    <span onclick="calificar('394da5e76b', 2)">★</span>
+                    <span onclick="calificar('394da5e76b', 3)">★</span>
+                    <span onclick="calificar('394da5e76b', 4)">★</span>
+                    <span onclick="calificar('394da5e76b', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('394da5e76b')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Senado - Tramitación de proyectos</span>
+                  <span>ayer 08:00</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMieEFVX3lxTE8wLUJjV2psc1JHNm9TMXRNQ0RzZVlVd21YdXAwLW9Ub3Q3YzBWa3h3aG1xZy1IRnIzRHRKY256dXJ2d00xbWttR3JtaTdsclZxOHVHZVR5c0R6a0VwbGNJMXdmMHkzQjQzTzRVLVMyZmpNeVdPVzlqZQ?oc=5" target="_blank" rel="noopener">https://tramitacion.senado.cl/wspublico/tramitacion.php?boletin=18491</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('394da5e76b')">
+                  <span>Profundizar nota</span> <span id="flecha-394da5e76b" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-394da5e76b" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMieEFVX3lxTE8wLUJjV2psc1JHNm9TMXRNQ0RzZVlVd21YdXAwLW9Ub3Q3YzBWa3h3aG1xZy1IRnIzRHRKY256dXJ2d00xbWttR3JtaTdsclZxOHVHZVR5c0R6a0VwbGNJMXdmMHkzQjQzTzRVLVMyZmpNeVdPVzlqZQ?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Senado - Tramitación de proyectos ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-b21bcc70e7">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="b21bcc70e7">
+                    <span onclick="calificar('b21bcc70e7', 1)">★</span>
+                    <span onclick="calificar('b21bcc70e7', 2)">★</span>
+                    <span onclick="calificar('b21bcc70e7', 3)">★</span>
+                    <span onclick="calificar('b21bcc70e7', 4)">★</span>
+                    <span onclick="calificar('b21bcc70e7', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('b21bcc70e7')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Cooperativa</span>
+                  <span>ayer 20:26</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxNdEJiM3RoMVlVbXVtSjJYVjhKVGpYa0g2Z0NqdWJhZ2o2M2xKUFU0NGt0SElWWkY4ZnBEbGU3THFXVl9KM1A1VjZjNGZQeTd6Y1U3MHpGMVBkQloydVM3UzhuT1pxek5Bdm0wVnl6eTJ1V1BNamswOVpkdV9KSF9SdjhzNFRELTJjeENqUNIBjAFBVV95cUxNdEJiM3RoMVlVbXVtSjJYVjhKVGpYa0g2Z0NqdWJhZ2o2M2xKUFU0NGt0SElWWkY4ZnBEbGU3THFXVl9KM1A1VjZjNGZQeTd6Y1U3MHpGMVBkQloydVM3UzhuT1pxek5Bdm0wVnl6eTJ1V1BNamswOVpkdV9KSF9SdjhzNFRELTJjeENqUA?oc=5" target="_blank" rel="noopener">¿Por qué la nueva Ley de Adopción aún no entra en vigencia?</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('b21bcc70e7')">
+                  <span>Profundizar nota</span> <span id="flecha-b21bcc70e7" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-b21bcc70e7" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxNdEJiM3RoMVlVbXVtSjJYVjhKVGpYa0g2Z0NqdWJhZ2o2M2xKUFU0NGt0SElWWkY4ZnBEbGU3THFXVl9KM1A1VjZjNGZQeTd6Y1U3MHpGMVBkQloydVM3UzhuT1pxek5Bdm0wVnl6eTJ1V1BNamswOVpkdV9KSF9SdjhzNFRELTJjeENqUNIBjAFBVV95cUxNdEJiM3RoMVlVbXVtSjJYVjhKVGpYa0g2Z0NqdWJhZ2o2M2xKUFU0NGt0SElWWkY4ZnBEbGU3THFXVl9KM1A1VjZjNGZQeTd6Y1U3MHpGMVBkQloydVM3UzhuT1pxek5Bdm0wVnl6eTJ1V1BNamswOVpkdV9KSF9SdjhzNFRELTJjeENqUA?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Cooperativa ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-3231fb70cb">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="3231fb70cb">
+                    <span onclick="calificar('3231fb70cb', 1)">★</span>
+                    <span onclick="calificar('3231fb70cb', 2)">★</span>
+                    <span onclick="calificar('3231fb70cb', 3)">★</span>
+                    <span onclick="calificar('3231fb70cb', 4)">★</span>
+                    <span onclick="calificar('3231fb70cb', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('3231fb70cb')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">CIPER Chile</span>
+                  <span>ayer 21:58</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.ciperchile.cl/2026/11/27/podcast-chadwick-el-artista-del-caso-penta/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=podcast-chadwick-el-artista-del-caso-penta" target="_blank" rel="noopener">Podcast | Chadwick: el «artista» del caso Penta</a>
+                </h3>
+
+                <p class="nota-resumen">La entrada Podcast | Chadwick: el «artista» del caso Penta se publicó primero en CIPER Chile .</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('3231fb70cb')">
+                  <span>Profundizar nota</span> <span id="flecha-3231fb70cb" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-3231fb70cb" class="caja-profundidad">
+                  
+                  <a href="https://www.ciperchile.cl/2026/11/27/podcast-chadwick-el-artista-del-caso-penta/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=podcast-chadwick-el-artista-del-caso-penta" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en CIPER Chile ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-d718193b0f">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="d718193b0f">
+                    <span onclick="calificar('d718193b0f', 1)">★</span>
+                    <span onclick="calificar('d718193b0f', 2)">★</span>
+                    <span onclick="calificar('d718193b0f', 3)">★</span>
+                    <span onclick="calificar('d718193b0f', 4)">★</span>
+                    <span onclick="calificar('d718193b0f', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('d718193b0f')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">El Mercurio</span>
+                  <span>ayer 11:22</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMif0FVX3lxTE04S0dzT2VzOS1yYlc3c3ByeDNoOXFsb29rRzNFS0RUYVNsSXB1QjdLaDIzNkZCdFFSenRPenpqQ2RKZENfU3NESk5RbWZObXIxSGhSams2T0VLSkVLcVBjN2tUTmh2em5vQ01wTk9HLXJ3a2JHSXhLUURUbExIdTA?oc=5" target="_blank" rel="noopener">Abstracto</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('d718193b0f')">
+                  <span>Profundizar nota</span> <span id="flecha-d718193b0f" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-d718193b0f" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMif0FVX3lxTE04S0dzT2VzOS1yYlc3c3ByeDNoOXFsb29rRzNFS0RUYVNsSXB1QjdLaDIzNkZCdFFSenRPenpqQ2RKZENfU3NESk5RbWZObXIxSGhSams2T0VLSkVLcVBjN2tUTmh2em5vQ01wTk9HLXJ3a2JHSXhLUURUbExIdTA?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en El Mercurio ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-ac41084e9c">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="ac41084e9c">
+                    <span onclick="calificar('ac41084e9c', 1)">★</span>
+                    <span onclick="calificar('ac41084e9c', 2)">★</span>
+                    <span onclick="calificar('ac41084e9c', 3)">★</span>
+                    <span onclick="calificar('ac41084e9c', 4)">★</span>
+                    <span onclick="calificar('ac41084e9c', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('ac41084e9c')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">El Mundo Bolivia</span>
+                  <span>ayer 18:17</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMiiwFBVV95cUxOaTZ4VzZlUFlORWwxV3IxRTZXYnN3czBNQzZsanAwZzdPV0I1R3ZyZXNKSHRCekVqa2lTTEpvS1k1dFVzTURaWWRZb1AyaW5PdUdFYUhtamlXYXpIRWV4Mi1naGl2NzY4ZThhVlZPcnBxQndSQTJtWWtOVk8yXzlOdS1hLWJkeVpIX1RZ?oc=5" target="_blank" rel="noopener">Chile busca que solo mayores de 14 años usen redes sociales</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('ac41084e9c')">
+                  <span>Profundizar nota</span> <span id="flecha-ac41084e9c" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-ac41084e9c" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMiiwFBVV95cUxOaTZ4VzZlUFlORWwxV3IxRTZXYnN3czBNQzZsanAwZzdPV0I1R3ZyZXNKSHRCekVqa2lTTEpvS1k1dFVzTURaWWRZb1AyaW5PdUdFYUhtamlXYXpIRWV4Mi1naGl2NzY4ZThhVlZPcnBxQndSQTJtWWtOVk8yXzlOdS1hLWJkeVpIX1RZ?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en El Mundo Bolivia ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            </div></section>
+<section id="ambiente" class="seccion-bloque"><div class="seccion-header"><h2 class="seccion-titulo"><span class="punto" style="background:#2E9B5F"></span>Medioambiente</h2><span class="seccion-cuenta">8 notas</span></div><div class="editorial-grid">
+            <article class="nota-card nota-portada" id="card-3231fb70cb">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="3231fb70cb">
+                    <span onclick="calificar('3231fb70cb', 1)">★</span>
+                    <span onclick="calificar('3231fb70cb', 2)">★</span>
+                    <span onclick="calificar('3231fb70cb', 3)">★</span>
+                    <span onclick="calificar('3231fb70cb', 4)">★</span>
+                    <span onclick="calificar('3231fb70cb', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('3231fb70cb')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">CIPER Chile</span>
+                  <span>ayer 21:58</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.ciperchile.cl/2026/11/27/podcast-chadwick-el-artista-del-caso-penta/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=podcast-chadwick-el-artista-del-caso-penta" target="_blank" rel="noopener">Podcast | Chadwick: el «artista» del caso Penta</a>
+                </h3>
+
+                <p class="nota-resumen">La entrada Podcast | Chadwick: el «artista» del caso Penta se publicó primero en CIPER Chile .</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('3231fb70cb')">
+                  <span>Profundizar nota</span> <span id="flecha-3231fb70cb" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-3231fb70cb" class="caja-profundidad">
+                  
+                  <a href="https://www.ciperchile.cl/2026/11/27/podcast-chadwick-el-artista-del-caso-penta/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=podcast-chadwick-el-artista-del-caso-penta" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en CIPER Chile ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-8f3308f1a2">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="8f3308f1a2">
+                    <span onclick="calificar('8f3308f1a2', 1)">★</span>
+                    <span onclick="calificar('8f3308f1a2', 2)">★</span>
+                    <span onclick="calificar('8f3308f1a2', 3)">★</span>
+                    <span onclick="calificar('8f3308f1a2', 4)">★</span>
+                    <span onclick="calificar('8f3308f1a2', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('8f3308f1a2')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Mongabay Latam</span>
+                  <span>ayer 19:22</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://imgs.mongabay.com/wp-content/uploads/sites/25/2026/11/27214731/RLP_4110_2009-11-15-12-44-14-768x512.jpg" alt="Ballenas jorobadas se enfrentan a las orcas para rescatar de ataques a focas y otros animales, revela estudio" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://es.mongabay.com/short-article/2026/11/ballenas-jorobadas-se-enfrentan-orcas-rescatar-ataques-focas-animales-revela-estudio/" target="_blank" rel="noopener">Ballenas jorobadas se enfrentan a las orcas para rescatar de ataques a focas y otros animales, revela estudio</a>
+                </h3>
+
+                <p class="nota-resumen">Las ballenas jorobadas no solo defienden a sus crías de las orcas: también suelen intervenir cuando estas atacan a otras especies, como las focas. Así lo concluye un estudio publicado en Marine Mammal Science, en el que un equipo liderado por Robert Pitman analizó más de 100 interacciones entre ambos cetáceos. Incluso…</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('8f3308f1a2')">
+                  <span>Profundizar nota</span> <span id="flecha-8f3308f1a2" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-8f3308f1a2" class="caja-profundidad">
+                  <ul class="puntos-lista"><li>se ha visto […]</li></ul>
+                  <a href="https://es.mongabay.com/short-article/2026/11/ballenas-jorobadas-se-enfrentan-orcas-rescatar-ataques-focas-animales-revela-estudio/" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Mongabay Latam ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-d718193b0f">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="d718193b0f">
+                    <span onclick="calificar('d718193b0f', 1)">★</span>
+                    <span onclick="calificar('d718193b0f', 2)">★</span>
+                    <span onclick="calificar('d718193b0f', 3)">★</span>
+                    <span onclick="calificar('d718193b0f', 4)">★</span>
+                    <span onclick="calificar('d718193b0f', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('d718193b0f')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">El Mercurio</span>
+                  <span>ayer 11:22</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMif0FVX3lxTE04S0dzT2VzOS1yYlc3c3ByeDNoOXFsb29rRzNFS0RUYVNsSXB1QjdLaDIzNkZCdFFSenRPenpqQ2RKZENfU3NESk5RbWZObXIxSGhSams2T0VLSkVLcVBjN2tUTmh2em5vQ01wTk9HLXJ3a2JHSXhLUURUbExIdTA?oc=5" target="_blank" rel="noopener">Abstracto</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('d718193b0f')">
+                  <span>Profundizar nota</span> <span id="flecha-d718193b0f" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-d718193b0f" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMif0FVX3lxTE04S0dzT2VzOS1yYlc3c3ByeDNoOXFsb29rRzNFS0RUYVNsSXB1QjdLaDIzNkZCdFFSenRPenpqQ2RKZENfU3NESk5RbWZObXIxSGhSams2T0VLSkVLcVBjN2tUTmh2em5vQ01wTk9HLXJ3a2JHSXhLUURUbExIdTA?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en El Mercurio ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-a1bbeab27c">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="a1bbeab27c">
+                    <span onclick="calificar('a1bbeab27c', 1)">★</span>
+                    <span onclick="calificar('a1bbeab27c', 2)">★</span>
+                    <span onclick="calificar('a1bbeab27c', 3)">★</span>
+                    <span onclick="calificar('a1bbeab27c', 4)">★</span>
+                    <span onclick="calificar('a1bbeab27c', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('a1bbeab27c')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">La Tercera</span>
+                  <span>hoy 06:00</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMijgJBVV95cUxNNTNCVHFuZk54U2pXUWU4aWxNbjliT21hTVYtaEN0VGlaVWhRZnE2cUdOVnBzbWdnVGp3LXFRQ0N5UTk0YkV5di12STZpZlkwcThnNi1jclBSTUVDZnRNNlVoNXJRLThmSjlSRGc1WUI4a3dRN2o2dldLQ3hDTHBBNksxSEI5aTZRMDFsVUdGWGdBTXhmcWpJVzI4VmJwRFNEY0wxWXJ1SDN0aFpFV0V6NnBlcGxaVV9yNWdHMWxEeHRiMnlPcmdadVYtblN0N2tBVVVLcFo1UlNsUHd6ZTJINFdMN052X2ZndVlnWVdQVEx6djEwMDdOd3JJLWQ5TE1VS181WHNPQm1OQWV6d2fSAa8CQVVfeXFMT2FCY05ONXFvVDJHM2tLMGxMWU9UMXBKWFBfSndYNTA4RFZ5LUtrRTRTSkhTdTFIcHZhUW9rZVNQc1ppb3ExTE9hazY2TlNfNDUwUXlCY1BKSm5wdWRlTm9TWlhJak1STGdGS2Z2N01aVDYyNTVhSlY0X19oVDNscFV5Nlp5TEUyc09PTzFidGR0SkNxaWdlM1F3Vy1YbFZGWHZ3cWlfWnhSSDYtUWxOMWh0eUwtd20xb002em96aFpHX1lHTVhQeXNXTFVWUWZEM0h0WDl6ZFRvWlpWLWd4UHJ6c3BXV2RPWEVFc0FXSmNGc0RHZHhVNlNnLVNFeUZDWExYS0FSZkxOTW9rSmh2bWstbUlJbkd5RG91NHVMVVhRdmZ6M2lPLUV2NURHdkZR?oc=5" target="_blank" rel="noopener">Francisca Toledo, ministra del Medio Ambiente: “Queremos mapear los lugares donde tener infraestructura pública para responder en adaptación”</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('a1bbeab27c')">
+                  <span>Profundizar nota</span> <span id="flecha-a1bbeab27c" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-a1bbeab27c" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMijgJBVV95cUxNNTNCVHFuZk54U2pXUWU4aWxNbjliT21hTVYtaEN0VGlaVWhRZnE2cUdOVnBzbWdnVGp3LXFRQ0N5UTk0YkV5di12STZpZlkwcThnNi1jclBSTUVDZnRNNlVoNXJRLThmSjlSRGc1WUI4a3dRN2o2dldLQ3hDTHBBNksxSEI5aTZRMDFsVUdGWGdBTXhmcWpJVzI4VmJwRFNEY0wxWXJ1SDN0aFpFV0V6NnBlcGxaVV9yNWdHMWxEeHRiMnlPcmdadVYtblN0N2tBVVVLcFo1UlNsUHd6ZTJINFdMN052X2ZndVlnWVdQVEx6djEwMDdOd3JJLWQ5TE1VS181WHNPQm1OQWV6d2fSAa8CQVVfeXFMT2FCY05ONXFvVDJHM2tLMGxMWU9UMXBKWFBfSndYNTA4RFZ5LUtrRTRTSkhTdTFIcHZhUW9rZVNQc1ppb3ExTE9hazY2TlNfNDUwUXlCY1BKSm5wdWRlTm9TWlhJak1STGdGS2Z2N01aVDYyNTVhSlY0X19oVDNscFV5Nlp5TEUyc09PTzFidGR0SkNxaWdlM1F3Vy1YbFZGWHZ3cWlfWnhSSDYtUWxOMWh0eUwtd20xb002em96aFpHX1lHTVhQeXNXTFVWUWZEM0h0WDl6ZFRvWlpWLWd4UHJ6c3BXV2RPWEVFc0FXSmNGc0RHZHhVNlNnLVNFeUZDWExYS0FSZkxOTW9rSmh2bWstbUlJbkd5RG91NHVMVVhRdmZ6M2lPLUV2NURHdkZR?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en La Tercera ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-9bf371fe90">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="9bf371fe90">
+                    <span onclick="calificar('9bf371fe90', 1)">★</span>
+                    <span onclick="calificar('9bf371fe90', 2)">★</span>
+                    <span onclick="calificar('9bf371fe90', 3)">★</span>
+                    <span onclick="calificar('9bf371fe90', 4)">★</span>
+                    <span onclick="calificar('9bf371fe90', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('9bf371fe90')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Mongabay Latam</span>
+                  <span>ayer 16:33</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://imgs.mongabay.com/wp-content/uploads/sites/25/2026/11/28002738/Comunidad-quechua-desarrolla-un-proyecto-de-camaras-trampa-y-capta-los-primeros-osos-andinos-de-su-reserva-en-Peru-foto-Pillco-Grande-768x512.jpg" alt="Comunidad quechua desarrolla un proyecto de cámaras trampa y capta los primeros osos andinos de su reserva en Perú" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://es.mongabay.com/short-article/2026/11/peru-comunidad-quechua-proyecto-camaras-trampa-osos-andinos-reserva/" target="_blank" rel="noopener">Comunidad quechua desarrolla un proyecto de cámaras trampa y capta los primeros osos andinos de su reserva en Perú</a>
+                </h3>
+
+                <p class="nota-resumen">La conservacionista quechua Maribel Pacco lidera un proyecto de cámaras trampa para estimar la población y los movimientos de los osos en Pumataki, una reserva privada de propiedad comunitaria ubicada en la zona de amortiguamiento del Parque Nacional Manu, en el sureste de Perú. Con la ayuda de su comunidad quechua de…</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('9bf371fe90')">
+                  <span>Profundizar nota</span> <span id="flecha-9bf371fe90" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-9bf371fe90" class="caja-profundidad">
+                  <ul class="puntos-lista"><li>Pillco Grande, el […]</li></ul>
+                  <a href="https://es.mongabay.com/short-article/2026/11/peru-comunidad-quechua-proyecto-camaras-trampa-osos-andinos-reserva/" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Mongabay Latam ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-a7e008253f">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="a7e008253f">
+                    <span onclick="calificar('a7e008253f', 1)">★</span>
+                    <span onclick="calificar('a7e008253f', 2)">★</span>
+                    <span onclick="calificar('a7e008253f', 3)">★</span>
+                    <span onclick="calificar('a7e008253f', 4)">★</span>
+                    <span onclick="calificar('a7e008253f', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('a7e008253f')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Universidad de Chile</span>
+                  <span>hoy 03:07</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMia0FVX3lxTE0ySWtCdXVocmtWWFdUMXp2U3lCUFROZTlSc0E4TUR2aFpWMXBrZXlhNzFYZ0FtUWFiTU5GcG12RVF2ZHpWeHlUMzZsck5KamwxYThNc2RxT2RfaGFfYjhLT1NxVE12M3J6UTI4?oc=5" target="_blank" rel="noopener">Lanzamiento del Núcleo ERIN: Conectando el Ambiente, la Biología Celular y la Resiliencia en Salud</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('a7e008253f')">
+                  <span>Profundizar nota</span> <span id="flecha-a7e008253f" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-a7e008253f" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMia0FVX3lxTE0ySWtCdXVocmtWWFdUMXp2U3lCUFROZTlSc0E4TUR2aFpWMXBrZXlhNzFYZ0FtUWFiTU5GcG12RVF2ZHpWeHlUMzZsck5KamwxYThNc2RxT2RfaGFfYjhLT1NxVE12M3J6UTI4?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Universidad de Chile ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-67dc8f4a1b">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="67dc8f4a1b">
+                    <span onclick="calificar('67dc8f4a1b', 1)">★</span>
+                    <span onclick="calificar('67dc8f4a1b', 2)">★</span>
+                    <span onclick="calificar('67dc8f4a1b', 3)">★</span>
+                    <span onclick="calificar('67dc8f4a1b', 4)">★</span>
+                    <span onclick="calificar('67dc8f4a1b', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('67dc8f4a1b')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">CIPER Chile</span>
+                  <span>ayer 19:18</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.ciperchile.cl/2026/11/27/la-escritura-escolar-frente-a-la-fiebre-de-la-ia/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=la-escritura-escolar-frente-a-la-fiebre-de-la-ia" target="_blank" rel="noopener">La escritura escolar frente a la “fiebre” de la IA</a>
+                </h3>
+
+                <p class="nota-resumen">La entrada La escritura escolar frente a la “fiebre” de la IA se publicó primero en CIPER Chile .</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('67dc8f4a1b')">
+                  <span>Profundizar nota</span> <span id="flecha-67dc8f4a1b" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-67dc8f4a1b" class="caja-profundidad">
+                  
+                  <a href="https://www.ciperchile.cl/2026/11/27/la-escritura-escolar-frente-a-la-fiebre-de-la-ia/?utm_source=rss&amp;utm_medium=rss&amp;utm_campaign=la-escritura-escolar-frente-a-la-fiebre-de-la-ia" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en CIPER Chile ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-11868264a5">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="11868264a5">
+                    <span onclick="calificar('11868264a5', 1)">★</span>
+                    <span onclick="calificar('11868264a5', 2)">★</span>
+                    <span onclick="calificar('11868264a5', 3)">★</span>
+                    <span onclick="calificar('11868264a5', 4)">★</span>
+                    <span onclick="calificar('11868264a5', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('11868264a5')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Mongabay Latam</span>
+                  <span>ayer 11:00</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://imgs.mongabay.com/wp-content/uploads/sites/25/2026/08/10142913/reunion-mineria-1536x1024-1-768x512.jpg" alt="Bolivia: nuevo Código Minero de gobierno de Paz busca habilitar minería en áreas protegidas y sitios Ramsar" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://es.mongabay.com/2026/11/bolivia-nuevo-codigo-minero-gobierno-paz-habilitar-mineria-areas-protegidas-sitios-ramsar/" target="_blank" rel="noopener">Bolivia: nuevo Código Minero de gobierno de Paz busca habilitar minería en áreas protegidas y sitios Ramsar</a>
+                </h3>
+
+                <p class="nota-resumen">En Bolivia, el gobierno de Rodrigo Paz propone reformar la ley que rige la actividad minera con un texto de 200 artículos que enfrenta cuestionamientos por los impactos ambientales que podría implicar. Los expertos consultados por Mongabay Latam plantean que el proyecto de Código Minero flexibiliza las condiciones…</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('11868264a5')">
+                  <span>Profundizar nota</span> <span id="flecha-11868264a5" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-11868264a5" class="caja-profundidad">
+                  <ul class="puntos-lista"><li>entales para el desarrollo de minería en […]</li></ul>
+                  <a href="https://es.mongabay.com/2026/11/bolivia-nuevo-codigo-minero-gobierno-paz-habilitar-mineria-areas-protegidas-sitios-ramsar/" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Mongabay Latam ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            </div></section>
+<section id="mundo" class="seccion-bloque"><div class="seccion-header"><h2 class="seccion-titulo"><span class="punto" style="background:#2A6FDB"></span>Geopolítica</h2><span class="seccion-cuenta">6 notas</span></div><div class="editorial-grid">
+            <article class="nota-card nota-portada" id="card-0845273d33">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="0845273d33">
+                    <span onclick="calificar('0845273d33', 1)">★</span>
+                    <span onclick="calificar('0845273d33', 2)">★</span>
+                    <span onclick="calificar('0845273d33', 3)">★</span>
+                    <span onclick="calificar('0845273d33', 4)">★</span>
+                    <span onclick="calificar('0845273d33', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('0845273d33')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">DW</span>
+                  <span>hoy 05:39</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.dw.com/es/la-apuesta-de-asia-central-para-alejarse-de-rusia-está-llena-de-retos/a-80081264?maca=spa-rss-sp-top-547-rdf" target="_blank" rel="noopener">La apuesta de Asia Central para alejarse de Rusia está llena de retos</a>
+                </h3>
+
+                <p class="nota-resumen">El Corredor Medio aspira a convertirse en un puente entre Europa y Asia y a reducir la dependencia de Asia Central respecto a Rusia. Un camino plagado de obstáculos.</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('0845273d33')">
+                  <span>Profundizar nota</span> <span id="flecha-0845273d33" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-0845273d33" class="caja-profundidad">
+                  
+                  <a href="https://www.dw.com/es/la-apuesta-de-asia-central-para-alejarse-de-rusia-está-llena-de-retos/a-80081264?maca=spa-rss-sp-top-547-rdf" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en DW ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-746112272e">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="746112272e">
+                    <span onclick="calificar('746112272e', 1)">★</span>
+                    <span onclick="calificar('746112272e', 2)">★</span>
+                    <span onclick="calificar('746112272e', 3)">★</span>
+                    <span onclick="calificar('746112272e', 4)">★</span>
+                    <span onclick="calificar('746112272e', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('746112272e')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">BBC Mundo</span>
+                  <span>hoy 00:26</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://ichef.bbci.co.uk/ace/ws/240/cpsprodpb/7cf3/live/854361b0-ea8d-11f1-a739-457c2295eaba.jpg" alt="&quot;Ni EE.UU. llegó tan lejos&quot;: por qué Costa Rica le impidió la entrada al país a Francesca Albanese, relatora especial de la ONU sobre los territorios palestinos" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.bbc.com/mundo/articles/cmpqrv8e8n32o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener">&quot;Ni EE.UU. llegó tan lejos&quot;: por qué Costa Rica le impidió la entrada al país a Francesca Albanese, relatora especial de la ONU sobre los territorios palestinos</a>
+                </h3>
+
+                <p class="nota-resumen">Albanese había sido invitada al país para recibir este viernes un doctorado honoris causa por la Universidad de Costa Rica, desde donde dijeron que &quot;lamentan profundamente esta situación&quot;.</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('746112272e')">
+                  <span>Profundizar nota</span> <span id="flecha-746112272e" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-746112272e" class="caja-profundidad">
+                  
+                  <a href="https://www.bbc.com/mundo/articles/cmpqrv8e8n32o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en BBC Mundo ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-148b4f7854">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="148b4f7854">
+                    <span onclick="calificar('148b4f7854', 1)">★</span>
+                    <span onclick="calificar('148b4f7854', 2)">★</span>
+                    <span onclick="calificar('148b4f7854', 3)">★</span>
+                    <span onclick="calificar('148b4f7854', 4)">★</span>
+                    <span onclick="calificar('148b4f7854', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('148b4f7854')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">BBC News</span>
+                  <span>hoy 04:31</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/297c/live/0c5c0a20-eafd-11f1-83de-2b6b9d423090.jpg" alt="Australian wrestler Bronson Reed dies aged 38, WWE says" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.bbc.co.uk/news/articles/cvwy08g70ldko?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener">Australian wrestler Bronson Reed dies aged 38, WWE says</a>
+                </h3>
+
+                <p class="nota-resumen">Tributes have flooded in for the 38-year-old Australian who is survived by his pregnant wife, Paige, their daughter.</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('148b4f7854')">
+                  <span>Profundizar nota</span> <span id="flecha-148b4f7854" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-148b4f7854" class="caja-profundidad">
+                  
+                  <a href="https://www.bbc.co.uk/news/articles/cvwy08g70ldko?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en BBC News ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-f255f1e83c">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="f255f1e83c">
+                    <span onclick="calificar('f255f1e83c', 1)">★</span>
+                    <span onclick="calificar('f255f1e83c', 2)">★</span>
+                    <span onclick="calificar('f255f1e83c', 3)">★</span>
+                    <span onclick="calificar('f255f1e83c', 4)">★</span>
+                    <span onclick="calificar('f255f1e83c', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('f255f1e83c')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">CNN en Español</span>
+                  <span>hoy 04:14</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxNLVUtcnhoNUxWdEh0VGRWSjJlRlJkS0hoTVU4WWFDcjd3VDQ4UUpEa2VTeVhJOHpuZWxXWmVkT1UwZkRxMjdGMi1Xd2tjZlVtdGNoNTFNMXVuUFV6SVlvdGI0VFI4WExlb3FESkN1cUpnSEVZcTVudDN6ZDE3RGdYYV9KWThndHNseGlmSg?oc=5" target="_blank" rel="noopener">Dejé que Siri escuchara mis conversaciones durante semanas. ¿Qué hizo bien y qué hizo mal?</a>
+                </h3>
+
+                <p class="nota-resumen"></p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('f255f1e83c')">
+                  <span>Profundizar nota</span> <span id="flecha-f255f1e83c" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-f255f1e83c" class="caja-profundidad">
+                  
+                  <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxNLVUtcnhoNUxWdEh0VGRWSjJlRlJkS0hoTVU4WWFDcjd3VDQ4UUpEa2VTeVhJOHpuZWxXWmVkT1UwZkRxMjdGMi1Xd2tjZlVtdGNoNTFNMXVuUFV6SVlvdGI0VFI4WExlb3FESkN1cUpnSEVZcTVudDN6ZDE3RGdYYV9KWThndHNseGlmSg?oc=5" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en CNN en Español ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-bb56b9722a">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="bb56b9722a">
+                    <span onclick="calificar('bb56b9722a', 1)">★</span>
+                    <span onclick="calificar('bb56b9722a', 2)">★</span>
+                    <span onclick="calificar('bb56b9722a', 3)">★</span>
+                    <span onclick="calificar('bb56b9722a', 4)">★</span>
+                    <span onclick="calificar('bb56b9722a', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('bb56b9722a')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">DW</span>
+                  <span>hoy 05:16</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.dw.com/es/arabia-saudita-y-los-rebeldes-hutíes-de-yemen-intercambian-ataques-contra-sus-capitales-respectivas/a-80083602?maca=spa-rss-sp-top-547-rdf" target="_blank" rel="noopener">Arabia Saudita y los rebeldes hutíes de Yemen intercambian ataques contra sus capitales respectivas</a>
+                </h3>
+
+                <p class="nota-resumen">Un misil de crucero fue interceptado en Riad y en Saná se registraron trece heridos en un barrio residencial. Pakistán y Turquía reiteraron su apoyo a Arabia Saudita.</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('bb56b9722a')">
+                  <span>Profundizar nota</span> <span id="flecha-bb56b9722a" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-bb56b9722a" class="caja-profundidad">
+                  
+                  <a href="https://www.dw.com/es/arabia-saudita-y-los-rebeldes-hutíes-de-yemen-intercambian-ataques-contra-sus-capitales-respectivas/a-80083602?maca=spa-rss-sp-top-547-rdf" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en DW ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-c2b9c186de">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="c2b9c186de">
+                    <span onclick="calificar('c2b9c186de', 1)">★</span>
+                    <span onclick="calificar('c2b9c186de', 2)">★</span>
+                    <span onclick="calificar('c2b9c186de', 3)">★</span>
+                    <span onclick="calificar('c2b9c186de', 4)">★</span>
+                    <span onclick="calificar('c2b9c186de', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('c2b9c186de')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">BBC Mundo</span>
+                  <span>hoy 00:21</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://ichef.bbci.co.uk/ace/ws/240/cpsprodpb/7f9b/live/9d67ed20-e29e-11f1-8dda-8925a81c3da5.jpg" alt="El país cuya revolución solar ha sido tan exitosa que su red eléctrica se está desmoronando" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.bbc.com/mundo/articles/c9y7rgpe5dp8o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener">El país cuya revolución solar ha sido tan exitosa que su red eléctrica se está desmoronando</a>
+                </h3>
+
+                <p class="nota-resumen">La instalación de paneles solares por parte de los ciudadanos ha contribuido a aumentar la cuota de energía solar en la electricidad de Pakistán del 1% al 28%. Pero también hay serios problemas.</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('c2b9c186de')">
+                  <span>Profundizar nota</span> <span id="flecha-c2b9c186de" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-c2b9c186de" class="caja-profundidad">
+                  
+                  <a href="https://www.bbc.com/mundo/articles/c9y7rgpe5dp8o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en BBC Mundo ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            </div></section>
+<section id="cine" class="seccion-bloque"><div class="seccion-header"><h2 class="seccion-titulo"><span class="punto" style="background:#C98A12"></span>Cine</h2><span class="seccion-cuenta">6 notas</span></div><div class="editorial-grid">
+            <article class="nota-card nota-portada con-foto" id="card-5095b54233">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="5095b54233">
+                    <span onclick="calificar('5095b54233', 1)">★</span>
+                    <span onclick="calificar('5095b54233', 2)">★</span>
+                    <span onclick="calificar('5095b54233', 3)">★</span>
+                    <span onclick="calificar('5095b54233', 4)">★</span>
+                    <span onclick="calificar('5095b54233', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('5095b54233')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+                <div class="foto-contenedor">
+                  <img src="https://i.blogs.es/82ffa9/s3phy4crk5f7pfaeb5si7vmah4/1024_2000.jpeg" alt="Esta película cuenta la historia de María Antonieta y Luis XVI que casi nunca vemos en el cine: la de sus últimos días antes de la guillotina" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Espinof</span>
+                  <span>hoy 05:00</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.espinof.com/cine-europeo/esta-pelicula-cuenta-historia-maria-antonieta-luis-xvi-que-casi-nunca-vemos-cine-sus-ultimos-dias-antes-guillotina" target="_blank" rel="noopener">Esta película cuenta la historia de María Antonieta y Luis XVI que casi nunca vemos en el cine: la de sus últimos días antes de la guillotina</a>
+                </h3>
+
+                <p class="nota-resumen">La historia de María Antonieta y Luis XVI se ha contado muchas veces en el cine, pero pocas aproximaciones han apostado por mostrar el final de la monarquía francesa desde una perspectiva tan incómoda como &#x27; Los últimos días de María Antonieta &#x27; (‘Le Déluge’), del cineasta italiano Gianluca Jodice . La película se…</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('5095b54233')">
+                  <span>Profundizar nota</span> <span id="flecha-5095b54233" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-5095b54233" class="caja-profundidad">
+                  <ul class="puntos-lista"><li>a de los grandes salones, los vestidos espectaculares y el lujo que suelen acompañar a las recreaciones de Versalles para adentrarse en el encierro y el deterioro de sus protagonistas . Empieza la cuenta atrás Con Guillaume Canet y Mélanie Laurent en la piel de los monarcas, la p</li></ul>
+                  <a href="https://www.espinof.com/cine-europeo/esta-pelicula-cuenta-historia-maria-antonieta-luis-xvi-que-casi-nunca-vemos-cine-sus-ultimos-dias-antes-guillotina" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Espinof ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-c9d57f6dfb">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="c9d57f6dfb">
+                    <span onclick="calificar('c9d57f6dfb', 1)">★</span>
+                    <span onclick="calificar('c9d57f6dfb', 2)">★</span>
+                    <span onclick="calificar('c9d57f6dfb', 3)">★</span>
+                    <span onclick="calificar('c9d57f6dfb', 4)">★</span>
+                    <span onclick="calificar('c9d57f6dfb', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('c9d57f6dfb')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Variety</span>
+                  <span>hoy 05:50</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://variety.com/wp-content/uploads/2026/11/Alpa.jpg" alt="Indonesian Drama ‘Alpa (Absence)’ Explores a Son’s Descent Into Extremism at JAFF Future Project" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://variety.com/2026/film/markets-festivals/indonesian-drama-alpa-absence-son-slide-extremism-1236959940/" target="_blank" rel="noopener">Indonesian Drama ‘Alpa (Absence)’ Explores a Son’s Descent Into Extremism at JAFF Future Project</a>
+                </h3>
+
+                <p class="nota-resumen">A teenage punk vocalist’s arrest reunites him with his estranged father, a respected cleric, at a religious paramilitary boot camp in “Alpa (Absence),” a feature film in development at Lune Features. Writer-director Dhiwangkara Seta’s feature debut is among the projects selected for the 2026 JAFF Future Project, a…</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('c9d57f6dfb')">
+                  <span>Profundizar nota</span> <span id="flecha-c9d57f6dfb" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-c9d57f6dfb" class="caja-profundidad">
+                  <ul class="puntos-lista"><li>lopment platform at the JAFF Market. The […]</li></ul>
+                  <a href="https://variety.com/2026/film/markets-festivals/indonesian-drama-alpa-absence-son-slide-extremism-1236959940/" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Variety ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-b02db62b48">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="b02db62b48">
+                    <span onclick="calificar('b02db62b48', 1)">★</span>
+                    <span onclick="calificar('b02db62b48', 2)">★</span>
+                    <span onclick="calificar('b02db62b48', 3)">★</span>
+                    <span onclick="calificar('b02db62b48', 4)">★</span>
+                    <span onclick="calificar('b02db62b48', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('b02db62b48')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">IndieWire</span>
+                  <span>ayer 17:30</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.indiewire.com/features/craft/odyssey-cinematography-hoyte-van-hoytema-1235230743/" target="_blank" rel="noopener">‘Odyssey’ Cinematographer Hoyte van Hoytema Was More Interested in the Intimate Than the Epic</a>
+                </h3>
+
+                <p class="nota-resumen">In spite of the film&#x27;s IMAX cameras and massive scale, the director of photography says that what always interested him and Christopher Nolan was the humanity at the core of their spectacular adventure.</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('b02db62b48')">
+                  <span>Profundizar nota</span> <span id="flecha-b02db62b48" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-b02db62b48" class="caja-profundidad">
+                  
+                  <a href="https://www.indiewire.com/features/craft/odyssey-cinematography-hoyte-van-hoytema-1235230743/" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en IndieWire ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-88f9d24c93">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="88f9d24c93">
+                    <span onclick="calificar('88f9d24c93', 1)">★</span>
+                    <span onclick="calificar('88f9d24c93', 2)">★</span>
+                    <span onclick="calificar('88f9d24c93', 3)">★</span>
+                    <span onclick="calificar('88f9d24c93', 4)">★</span>
+                    <span onclick="calificar('88f9d24c93', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('88f9d24c93')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Espinof</span>
+                  <span>ayer 19:30</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://i.blogs.es/b4fee2/terminator/1024_2000.jpeg" alt="&#x27;Terminator&#x27; tuvo que cancelar un videojuego para NES que ya estaba terminado. Los productores lo convirtieron en otro título a toda velocidad, y se convirtió en un clásico" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.espinof.com/divulgacion/terminator-tuvo-que-cancelar-videojuego-para-nes-que-estaba-terminado-productores-convirtieron-otro-titulo-a-toda-velocidad-se-convirtio-clasico" target="_blank" rel="noopener">&#x27;Terminator&#x27; tuvo que cancelar un videojuego para NES que ya estaba terminado. Los productores lo convirtieron en otro título a toda velocidad, y se convirtió en un clásico</a>
+                </h3>
+
+                <p class="nota-resumen">Aunque el arte de los videojuegos licenciados ha ido desapareciendo con el tiempo, lo cierto es que en los años 80 y 90 formaba parte indispensable del panorama gamer: juegos muy baratos en su mayoría y hechos a toda prisa para coincidir con el estreno de una película que, muy de vez en cuando, nos regalaron clásicos…</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('88f9d24c93')">
+                  <span>Profundizar nota</span> <span id="flecha-88f9d24c93" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-88f9d24c93" class="caja-profundidad">
+                  <ul class="puntos-lista"><li>omo &#x27;Aladdin&#x27;, &#x27;GoldenEye 007&#x27;, &#x27;Spider-Man 2&#x27; o &#x27;Blade Runner&#x27;. Sin embargo, las duras condiciones de algunas productoras dieron al traste con proyectos verdaderamente originales y únicos que tuvieron que apañárselas para reconvertirse en otra cosa... como le pasó al videojuego </li></ul>
+                  <a href="https://www.espinof.com/divulgacion/terminator-tuvo-que-cancelar-videojuego-para-nes-que-estaba-terminado-productores-convirtieron-otro-titulo-a-toda-velocidad-se-convirtio-clasico" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Espinof ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-40ca8a5b6d">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="40ca8a5b6d">
+                    <span onclick="calificar('40ca8a5b6d', 1)">★</span>
+                    <span onclick="calificar('40ca8a5b6d', 2)">★</span>
+                    <span onclick="calificar('40ca8a5b6d', 3)">★</span>
+                    <span onclick="calificar('40ca8a5b6d', 4)">★</span>
+                    <span onclick="calificar('40ca8a5b6d', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('40ca8a5b6d')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Variety</span>
+                  <span>hoy 05:14</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://variety.com/wp-content/uploads/2026/11/im-33898393.jpg" alt="‘The Hunchback, Soul of Paris’ Review: Quasimodo Gets an Origin Story, for Some Reason" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://variety.com/2026/film/reviews/the-hunchback-soul-of-paris-review-1236959927/" target="_blank" rel="noopener">‘The Hunchback, Soul of Paris’ Review: Quasimodo Gets an Origin Story, for Some Reason</a>
+                </h3>
+
+                <p class="nota-resumen">It isn’t necessarily a recession indicator when cinema resorts to 19th-century IP, but the raft of recent Victor Hugo and Alexandre Dumas adaptations (“The Count of Monte Cristo,” “The Three Musketeers,” “Les Misérables”) surely doesn’t point to a resolutely confident industry either. Now a new film joins these ranks,…</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('40ca8a5b6d')">
+                  <span>Profundizar nota</span> <span id="flecha-40ca8a5b6d" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-40ca8a5b6d" class="caja-profundidad">
+                  <ul class="puntos-lista"><li>as director Jean-François Richet and star […]</li></ul>
+                  <a href="https://variety.com/2026/film/reviews/the-hunchback-soul-of-paris-review-1236959927/" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Variety ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-23d1fd4c50">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="23d1fd4c50">
+                    <span onclick="calificar('23d1fd4c50', 1)">★</span>
+                    <span onclick="calificar('23d1fd4c50', 2)">★</span>
+                    <span onclick="calificar('23d1fd4c50', 3)">★</span>
+                    <span onclick="calificar('23d1fd4c50', 4)">★</span>
+                    <span onclick="calificar('23d1fd4c50', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('23d1fd4c50')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">IndieWire</span>
+                  <span>ayer 13:00</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.indiewire.com/features/animation/weta-fx-visual-effects-supervisors-stop-motion-wildwood-1235230742/" target="_blank" rel="noopener">Forget Photorealism: How ‘Wildwood’ Made Its Handmade Digital Artistry Visible</a>
+                </h3>
+
+                <p class="nota-resumen">WETA VFX Supervisors Dan Macarin and Sabine Laimer tell IndieWire how they matched the tones and textures of Laika&#x27;s stop-motion film.</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('23d1fd4c50')">
+                  <span>Profundizar nota</span> <span id="flecha-23d1fd4c50" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-23d1fd4c50" class="caja-profundidad">
+                  
+                  <a href="https://www.indiewire.com/features/animation/weta-fx-visual-effects-supervisors-stop-motion-wildwood-1235230742/" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en IndieWire ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            </div></section>
+<section id="tecnologia" class="seccion-bloque"><div class="seccion-header"><h2 class="seccion-titulo"><span class="punto" style="background:#7A4FD6"></span>Tecnología</h2><span class="seccion-cuenta">6 notas</span></div><div class="editorial-grid">
+            <article class="nota-card nota-portada con-foto" id="card-fab65f2d3a">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="fab65f2d3a">
+                    <span onclick="calificar('fab65f2d3a', 1)">★</span>
+                    <span onclick="calificar('fab65f2d3a', 2)">★</span>
+                    <span onclick="calificar('fab65f2d3a', 3)">★</span>
+                    <span onclick="calificar('fab65f2d3a', 4)">★</span>
+                    <span onclick="calificar('fab65f2d3a', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('fab65f2d3a')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+                <div class="foto-contenedor">
+                  <img src="https://i.blogs.es/07c27e/gemini_generated_image_p4w4ftp4w4ftp4w4/1024_2000.jpeg" alt="A cuántos grados calienta Europa su casa: el mapa que explica por qué más calor no siempre es derroche" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Xataka</span>
+                  <span>hoy 06:00</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.xataka.com/energia/a-cuantos-grados-calienta-europa-su-casa-mapa-que-explica-que-calor-no-siempre-derroche" target="_blank" rel="noopener">A cuántos grados calienta Europa su casa: el mapa que explica por qué más calor no siempre es derroche</a>
+                </h3>
+
+                <p class="nota-resumen">Oficialmente no es invierno, pero a juzgar por el rasca que hace cuando sales a la calle, quién lo diría: estamos ante la primera masa de aire polar de la temporada y, si habías demorado la puesta en marcha de tu calefacción, estos días te costará resistirse. Y con el encendido de la calefacción vuelven a aparecer…</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('fab65f2d3a')">
+                  <span>Profundizar nota</span> <span id="flecha-fab65f2d3a" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-fab65f2d3a" class="caja-profundidad">
+                  <ul class="puntos-lista"><li>des clásicos de la climatización como si es mejor dejarla encendida todo el día o apagarla o qué temperatura es la ideal . A esta última pregunta la OMS tiene una respuesta muy clara , pero Europa no opina igual y tiene sus razones. Este es el mapa del termostato de los hogares e</li></ul>
+                  <a href="https://www.xataka.com/energia/a-cuantos-grados-calienta-europa-su-casa-mapa-que-explica-que-calor-no-siempre-derroche" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Xataka ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-c5cde73899">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="c5cde73899">
+                    <span onclick="calificar('c5cde73899', 1)">★</span>
+                    <span onclick="calificar('c5cde73899', 2)">★</span>
+                    <span onclick="calificar('c5cde73899', 3)">★</span>
+                    <span onclick="calificar('c5cde73899', 4)">★</span>
+                    <span onclick="calificar('c5cde73899', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('c5cde73899')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Ars Technica</span>
+                  <span>ayer 14:05</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://cdn.arstechnica.net/wp-content/uploads/2026/11/black_friday_matrix-1152x648-1795796083.jpg" alt="The best Black Friday deals Ars could find" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://arstechnica.com/shopping/2026/11/the-best-black-friday-deals-ars-could-find/" target="_blank" rel="noopener">The best Black Friday deals Ars could find</a>
+                </h3>
+
+                <p class="nota-resumen">Perhaps some commerce, to help all the Turkey Day leftovers go down easier?</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('c5cde73899')">
+                  <span>Profundizar nota</span> <span id="flecha-c5cde73899" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-c5cde73899" class="caja-profundidad">
+                  
+                  <a href="https://arstechnica.com/shopping/2026/11/the-best-black-friday-deals-ars-could-find/" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Ars Technica ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-b5d6e4c31a">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="b5d6e4c31a">
+                    <span onclick="calificar('b5d6e4c31a', 1)">★</span>
+                    <span onclick="calificar('b5d6e4c31a', 2)">★</span>
+                    <span onclick="calificar('b5d6e4c31a', 3)">★</span>
+                    <span onclick="calificar('b5d6e4c31a', 4)">★</span>
+                    <span onclick="calificar('b5d6e4c31a', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('b5d6e4c31a')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">DW Ciencia y Tecnología</span>
+                  <span>ayer 15:04</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.dw.com/es/un-robot-baja-a-6-000-metros-y-halla-erupciones-explosivas-que-la-ciencia-daba-por-imposibles/a-80080956?maca=spa-rss-sp-cyt-1012-rdf" target="_blank" rel="noopener">Un robot baja a 6.000 metros y halla erupciones explosivas que la ciencia daba por imposibles</a>
+                </h3>
+
+                <p class="nota-resumen">Un robot descendió a más de seis kilómetros de profundidad en el fondo del Pacífico y recogió unas rocas que nadie esperaba encontrar allí.</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('b5d6e4c31a')">
+                  <span>Profundizar nota</span> <span id="flecha-b5d6e4c31a" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-b5d6e4c31a" class="caja-profundidad">
+                  
+                  <a href="https://www.dw.com/es/un-robot-baja-a-6-000-metros-y-halla-erupciones-explosivas-que-la-ciencia-daba-por-imposibles/a-80080956?maca=spa-rss-sp-cyt-1012-rdf" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en DW Ciencia y Tecnología ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-44b2f6d5f0">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="44b2f6d5f0">
+                    <span onclick="calificar('44b2f6d5f0', 1)">★</span>
+                    <span onclick="calificar('44b2f6d5f0', 2)">★</span>
+                    <span onclick="calificar('44b2f6d5f0', 3)">★</span>
+                    <span onclick="calificar('44b2f6d5f0', 4)">★</span>
+                    <span onclick="calificar('44b2f6d5f0', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('44b2f6d5f0')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Xataka</span>
+                  <span>hoy 05:55</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://i.blogs.es/e3b269/sede-sap-sobre-fondo-cibernetico-rojo-1-/1024_2000.jpeg" alt="Ciberataque a SAP, la mayor empresa de software de Europa: el verdadero peligro está en el código" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.xataka.com/seguridad/ciberataque-a-sap-mayor-empresa-software-europa-verdadero-peligro-esta-codigo" target="_blank" rel="noopener">Ciberataque a SAP, la mayor empresa de software de Europa: el verdadero peligro está en el código</a>
+                </h3>
+
+                <p class="nota-resumen">El software de SAP no es tan conocido ni tan utilizado como Outlook, pero sus aplicaciones mueven la contabilidad de media Europa. Pues bien, la empresa alemana ha confirmado que &quot;había detectado actividad sospechosa&quot;, tal y como adelantaba Der Spiegel el jueves. Al parecer, el riesgo no está en lo que se han llevado,…</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('44b2f6d5f0')">
+                  <span>Profundizar nota</span> <span id="flecha-44b2f6d5f0" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-44b2f6d5f0" class="caja-profundidad">
+                  <ul class="puntos-lista"><li>sino en lo que pueden haber dejado en GitHub. Qué ha pasado . Reuters recogía la declaración de SAP en el que identificaba esa actividad sospechosa y cómo ha puesto cerco a posibles daños: &quot;Según nuestra investigación hasta la fecha, no hemos encontrado ninguna evidencia de acces</li></ul>
+                  <a href="https://www.xataka.com/seguridad/ciberataque-a-sap-mayor-empresa-software-europa-verdadero-peligro-esta-codigo" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Xataka ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-644cca74d9">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="644cca74d9">
+                    <span onclick="calificar('644cca74d9', 1)">★</span>
+                    <span onclick="calificar('644cca74d9', 2)">★</span>
+                    <span onclick="calificar('644cca74d9', 3)">★</span>
+                    <span onclick="calificar('644cca74d9', 4)">★</span>
+                    <span onclick="calificar('644cca74d9', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('644cca74d9')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">Ars Technica</span>
+                  <span>ayer 09:05</span>
+                </div>
+
+                
+                <div class="foto-contenedor">
+                  <img src="https://cdn.arstechnica.net/wp-content/uploads/2025/08/intel-card-1536x864-1-1152x648.jpg" alt="Intel faced a choice: Give Trump 10% or face the consequences" class="foto-img" loading="lazy" onerror="this.parentElement.style.display='none'">
+                </div>
+
+                <h3 class="nota-titulo">
+                  <a href="https://arstechnica.com/tech-policy/2026/11/intel-faced-a-choice-give-trump-10-or-face-the-consequences/" target="_blank" rel="noopener">Intel faced a choice: Give Trump 10% or face the consequences</a>
+                </h3>
+
+                <p class="nota-resumen">Intel faced pressure to surrender a 10% stake to unlock billions in promised grants.</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('644cca74d9')">
+                  <span>Profundizar nota</span> <span id="flecha-644cca74d9" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-644cca74d9" class="caja-profundidad">
+                  
+                  <a href="https://arstechnica.com/tech-policy/2026/11/intel-faced-a-choice-give-trump-10-or-face-the-consequences/" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en Ars Technica ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            
+            <article class="nota-card " id="card-f2d99cdc6b">
+              <div class="menu-pos">
+                <button class="btn-tres-puntos" onclick="toggleMenu(this, event)" title="Opciones de la nota">⋮</button>
+                <div class="menu-desplegable">
+                  <div class="menu-label">Calificar interés:</div>
+                  <div class="estrellas" data-id="f2d99cdc6b">
+                    <span onclick="calificar('f2d99cdc6b', 1)">★</span>
+                    <span onclick="calificar('f2d99cdc6b', 2)">★</span>
+                    <span onclick="calificar('f2d99cdc6b', 3)">★</span>
+                    <span onclick="calificar('f2d99cdc6b', 4)">★</span>
+                    <span onclick="calificar('f2d99cdc6b', 5)">★</span>
+                  </div>
+                  <button class="btn-eliminar" onclick="eliminarNota('f2d99cdc6b')">
+                    ✕ Eliminar de mi feed
+                  </button>
+                </div>
+              </div>
+
+              
+
+              <div class="nota-contenido">
+                <div class="nota-top">
+                  <span class="nota-fuente">DW Ciencia y Tecnología</span>
+                  <span>ayer 15:03</span>
+                </div>
+
+                
+
+                <h3 class="nota-titulo">
+                  <a href="https://www.dw.com/es/el-agujero-de-la-capa-de-ozono-se-agranda-hasta-ser-uno-de-los-mayores-en-décadas/a-80081335?maca=spa-rss-sp-cyt-1012-rdf" target="_blank" rel="noopener">El agujero de la capa de ozono se agranda hasta ser uno de los mayores en décadas</a>
+                </h3>
+
+                <p class="nota-resumen">Fue más grande que la Antártida y superó en un 31 % la media de los últimos 20 años, pero su profundidad se quedó cerca de lo habitual. Un vórtice polar inusualmente persistente explica el tamaño.</p>
+
+                <button class="btn-profundizar" onclick="toggleProfundidad('f2d99cdc6b')">
+                  <span>Profundizar nota</span> <span id="flecha-f2d99cdc6b" class="flecha-rotar">▾</span>
+                </button>
+
+                <div id="prof-f2d99cdc6b" class="caja-profundidad">
+                  
+                  <a href="https://www.dw.com/es/el-agujero-de-la-capa-de-ozono-se-agranda-hasta-ser-uno-de-los-mayores-en-décadas/a-80081335?maca=spa-rss-sp-cyt-1012-rdf" target="_blank" rel="noopener" class="btn-leer-origen">
+                    Leer nota completa en DW Ciencia y Tecnología ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+            </div></section>
+</main>
+
+<footer class="pie-editorial">
+  <div class="contenedor">
+    <p class="pie-fin">Eso es todo por hoy.</p>
+    <p class="pie-sub">La próxima edición saldrá mañana temprano.</p>
+    <div style="margin-bottom: 28px;">
+      <button class="btn-preferencias" onclick="verPreferencias()">
+        ⚙️ Ver mis notas y preferencias de IA
+      </button>
+    </div>
+    <div style="margin-top:24px;"><h4 style="font:600 13px Inter,sans-serif; text-transform:uppercase; margin-bottom:8px; color:var(--apagado);">Ediciones anteriores</h4><ul style="list-style:none; padding:0; margin:0;"><li style="display:inline-block; margin-right:12px;"><a href="../index.html" style="color:var(--acento);">Edición de hoy</a></li><li style="display:inline-block; margin-right:12px;"><a href="2026-11-28.html" style="color:var(--tinta-suave);">28 nov</a></li><li style="display:inline-block; margin-right:12px;"><a href="2026-11-27.html" style="color:var(--tinta-suave);">27 nov</a></li><li style="display:inline-block; margin-right:12px;"><a href="2026-11-26.html" style="color:var(--tinta-suave);">26 nov</a></li><li style="display:inline-block; margin-right:12px;"><a href="2026-11-25.html" style="color:var(--tinta-suave);">25 nov</a></li><li style="display:inline-block; margin-right:12px;"><a href="2026-11-24.html" style="color:var(--tinta-suave);">24 nov</a></li><li style="display:inline-block; margin-right:12px;"><a href="2026-11-23.html" style="color:var(--tinta-suave);">23 nov</a></li><li style="display:inline-block; margin-right:12px;"><a href="2026-11-22.html" style="color:var(--tinta-suave);">22 nov</a></li><li style="display:inline-block; margin-right:12px;"><a href="2026-11-21.html" style="color:var(--tinta-suave);">21 nov</a></li></ul></div>
+    <details style="margin-top:20px; font-size:13px; color:var(--apagado);"><summary>6 aviso(s) de fuentes</summary><ul><li>IA en «Chile»: 404 NOT_FOUND. {&#x27;error&#x27;: {&#x27;code&#x27;: 404, &#x27;message&#x27;: &#x27;This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).&#x27;, &#x27;status&#x27;: &#x27;NOT_FOUND&#x27;}}</li><li>IA en «Congreso Nacional»: 404 NOT_FOUND. {&#x27;error&#x27;: {&#x27;code&#x27;: 404, &#x27;message&#x27;: &#x27;This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).&#x27;, &#x27;status&#x27;: &#x27;NOT_FOUND&#x27;}}</li><li>IA en «Medioambiente»: 404 NOT_FOUND. {&#x27;error&#x27;: {&#x27;code&#x27;: 404, &#x27;message&#x27;: &#x27;This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).&#x27;, &#x27;status&#x27;: &#x27;NOT_FOUND&#x27;}}</li><li>IA en «Geopolítica»: 404 NOT_FOUND. {&#x27;error&#x27;: {&#x27;code&#x27;: 404, &#x27;message&#x27;: &#x27;This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).&#x27;, &#x27;status&#x27;: &#x27;NOT_FOUND&#x27;}}</li><li>IA en «Cine»: 404 NOT_FOUND. {&#x27;error&#x27;: {&#x27;code&#x27;: 404, &#x27;message&#x27;: &#x27;This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).&#x27;, &#x27;status&#x27;: &#x27;NOT_FOUND&#x27;}}</li><li>IA en «Tecnología»: 404 NOT_FOUND. {&#x27;error&#x27;: {&#x27;code&#x27;: 404, &#x27;message&#x27;: &#x27;This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-started).&#x27;, &#x27;status&#x27;: &#x27;NOT_FOUND&#x27;}}</li></ul></details>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+const STORAGE_RATINGS = 'boletin_ratings_v1';
+const STORAGE_DISMISSED = 'boletin_dismissed_v1';
+
+function obtenerRatings() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_RATINGS) || '{}'); }
+  catch(e) { return {}; }
+}
+
+function obtenerDismissed() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_DISMISSED) || '[]'); }
+  catch(e) { return []; }
+}
+
+function mostrarToast(msg) {
+  const t = document.getElementById('toast');
+  if(!t) return;
+  t.innerText = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 2200);
+}
+
+function toggleMenu(btn, e) {
+  e.stopPropagation();
+  const menu = btn.nextElementSibling;
+  document.querySelectorAll('.menu-desplegable.activo').forEach(m => {
+    if(m !== menu) m.classList.remove('activo');
+  });
+  menu.classList.toggle('activo');
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.menu-desplegable.activo').forEach(m => m.classList.remove('activo'));
+});
+
+function calificar(id, estrellas) {
+  const ratings = obtenerRatings();
+  ratings[id] = estrellas;
+  localStorage.setItem(STORAGE_RATINGS, JSON.stringify(ratings));
+  actualizarEstrellasUI(id, estrellas);
+  mostrarToast(`Guardada: ${estrellas} estrella(s) ⭐`);
+}
+
+function actualizarEstrellasUI(id, estrellas) {
+  const cont = document.querySelector(`.estrellas[data-id="${id}"]`);
+  if (!cont) return;
+  const spans = cont.querySelectorAll('span');
+  spans.forEach((s, idx) => {
+    s.classList.toggle('activo', idx < estrellas);
+  });
+}
+
+function eliminarNota(id) {
+  const card = document.getElementById(`card-${id}`);
+  if (!card) return;
+  card.classList.add('fade-out');
+  setTimeout(() => {
+    card.style.display = 'none';
+  }, 300);
+  const dismissed = obtenerDismissed();
+  if(!dismissed.includes(id)) {
+    dismissed.push(id);
+    localStorage.setItem(STORAGE_DISMISSED, JSON.stringify(dismissed));
+  }
+  mostrarToast('Nota eliminada de tu feed');
+}
+
+function toggleProfundidad(id) {
+  const caja = document.getElementById(`prof-${id}`);
+  const flecha = document.getElementById(`flecha-${id}`);
+  if(!caja) return;
+  const abierta = caja.classList.toggle('visible');
+  if(flecha) flecha.classList.toggle('abierto', abierta);
+}
+
+function verPreferencias() {
+  const ratings = obtenerRatings();
+  const dismissed = obtenerDismissed();
+  const totalNotas = Object.keys(ratings).length;
+  alert(
+    `📊 Tus preferencias guardadas:\n\n` +
+    `• Noticias calificadas con estrellas: ${totalNotas}\n` +
+    `• Noticias descartadas de tu feed: ${dismissed.length}\n\n` +
+    `¡Gemini utilizará este historial para afinar la selección en tus próximas ediciones!`
+  );
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const dismissed = obtenerDismissed();
+  dismissed.forEach(id => {
+    const card = document.getElementById(`card-${id}`);
+    if(card) card.style.display = 'none';
+  });
+
+  const ratings = obtenerRatings();
+  Object.keys(ratings).forEach(id => {
+    actualizarEstrellasUI(id, ratings[id]);
+  });
+});
+</script>
+</body>
+</html>
